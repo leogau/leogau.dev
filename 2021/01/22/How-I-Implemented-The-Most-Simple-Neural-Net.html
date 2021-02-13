@@ -174,7 +174,7 @@ window.onload = wrap_img;
 </h1>
 <p>I'm going to build a neural network which outputs a target number given a specific input number. For example, given the number <code>5</code>, I want the neural network to output the number <code>42</code>.</p>
 <p>Now I can hear you think to yourself, "That's stupid. How is that better than a function with the line <code>return 42</code> in the body?"</p>
-<p>What's cool about this code is that I didn't type the number <code>5</code> or <code>42</code> anywhere in the body of the network. Instead, I told the network I wanted it to print <code>42</code> when it recieved <code>5</code> as an input and it figure out how to adjust itself to do that.</p>
+<p>What's cool about this code is that I didn't type the number <code>5</code> or <code>42</code> anywhere in the body of the network. Instead, I told the network I wanted it to print <code>42</code> when it received <code>5</code> as an input and it figure out how to adjust itself to do that.</p>
 <p>In fact, I could train the network on any 2 numbers using the same code. Try changing the parameters yourself and test it out!</p>
 <p>With that context, let's see what the code looks like for this most simple neural network.</p>
 
@@ -403,7 +403,7 @@ Error: 0.02447549348672308
 <p>The network calculates the derivative by multiplying the <code>delta</code> by the weight's input to get the <code>weight_delta</code>. <code>weight_delta</code> is the direction and the amount we're going to change the weight by.</p>
 <div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.01</span>
 </pre></div>
-<p>One bit of nuance is the variable <code>alpha</code>. <code>alpha</code> is a throttle limiting how much we actually adjust the weights by. Determining the appropriate rate of change for the weights of a neural network is a challenge. If the steps are too large, the network will overshoot the error getting to zero and start acting in unpredictable ways. If the steps are too small, the network will take a long time and need a very large number of training cycles.</p>
+<p>One bit of nuance is the variable <code>alpha</code>. <code>alpha</code> is a throttle limiting how much we actually adjust the weights. Determining the appropriate rate of change for the weights of a neural network is a challenge. If the steps are too large, the network will overshoot the error getting to zero and start acting in unpredictable ways. If the steps are too small, the network will take a long time and need a very large number of training cycles.</p>
 <p>The solution to this problem is to multiply partial derivative by a single number between 0 and 1. This lets us control the rate of change and adjust the learning as needed.</p>
 <p>Finding the appropriate <code>alpha</code> is often done through trial and error so we're just going to hard code is here.</p>
 
@@ -434,7 +434,7 @@ Error: 0.02447549348672308
 </h1>
 <p>I'm able to give the neural network the number <code>5</code>, and have it output a number very close to our goal number <code>42</code> without putting the number <code>5</code> or <code>42</code> in the body of the function.</p>
 <p>I also learned the basic parts which make up all neural networks and we learned the process of how the network learns.</p>
-<p>As we start to move into networks with multiple inputs, multiple outputs, and multiple layers, it's going to get a lot more complicated. However, the mental model stays the same. The network makes a prediction by multiplying the recieved input with its stored weights. It measures the error, takes the derivative, and adjusts the weights so that error moves towards 0. Then it goes again.</p>
+<p>As we start to move into networks with multiple inputs, multiple outputs, and multiple layers, it's going to get a lot more complicated. However, the mental model stays the same. The network makes a prediction by multiplying the received input with its stored weights. It measures the error, takes the derivative, and adjusts the weights so that error moves towards 0. Then it goes again.</p>
 
 </div>
 </div>
