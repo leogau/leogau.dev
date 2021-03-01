@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>How I Identify Handwritten Digits Using Only Python | Leo Gau</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="How I Identify Handwritten Digits Using Only Python" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Training a neural network to correctly identify digits from the MNIST dataset" />
+<meta property="og:description" content="Training a neural network to correctly identify digits from the MNIST dataset" />
+<link rel="canonical" href="https://leogau.dev/2021/02/28/MINST.html" />
+<meta property="og:url" content="https://leogau.dev/2021/02/28/MINST.html" />
+<meta property="og:site_name" content="Leo Gau" />
+<meta property="og:image" content="https://leogau.dev/images/MnistExamples.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-02-28T00:00:00-06:00" />
+<script type="application/ld+json">
+{"url":"https://leogau.dev/2021/02/28/MINST.html","@type":"BlogPosting","headline":"How I Identify Handwritten Digits Using Only Python","dateModified":"2021-02-28T00:00:00-06:00","datePublished":"2021-02-28T00:00:00-06:00","image":"https://leogau.dev/images/MnistExamples.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://leogau.dev/2021/02/28/MINST.html"},"description":"Training a neural network to correctly identify digits from the MNIST dataset","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://leogau.dev/feed.xml" title="Leo Gau" /><link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Leo Gau</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+            <a class="page-link" href="https://twitter.com/leogau" target="_blank">About</a><a class="page-link" href="/search/">Search</a><a class="page-link" href="/categories/">Tags</a></div>
+      </nav></div>
+</header><main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">How I Identify Handwritten Digits Using Only Python</h1><p class="page-description">Training a neural network to correctly identify digits from the MNIST dataset</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2021-02-28T00:00:00-06:00" itemprop="datePublished">
+        Feb 28, 2021
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      20 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/categories/#Grokking Deep Learning">Grokking Deep Learning</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#Deep Learning">Deep Learning</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#Python">Python</a>
+        
+      
+      </p>
+    
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-end">
+          <div class="px-2">
+
+    <a href="https://github.com/leogau/leogau.dev/tree/master/_notebooks/2021-02-28-MINST.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://mybinder.org/v2/gh/leogau/leogau.dev/master?filepath=_notebooks%2F2021-02-28-MINST.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/assets/badges/binder.svg" alt="Open In Binder"/>
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/leogau/leogau.dev/blob/master/_notebooks/2021-02-28-MINST.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h1"><a href="#What-I'm-Building">What I&#39;m Building </a></li>
+<li class="toc-entry toc-h1"><a href="#The-Code">The Code </a></li>
+<li class="toc-entry toc-h1"><a href="#Get-Dataset">Get Dataset </a></li>
+<li class="toc-entry toc-h1"><a href="#Prepare-Data">Prepare Data </a></li>
+<li class="toc-entry toc-h1"><a href="#Matrix-Math-Helper-Functions">Matrix Math Helper Functions </a></li>
+<li class="toc-entry toc-h1"><a href="#Neural-Network">Neural Network </a></li>
+<li class="toc-entry toc-h1"><a href="#Training-The-Network-On-The-First-Data-Point">Training The Network On The First Data Point </a></li>
+<li class="toc-entry toc-h1"><a href="#Training-The-Network-On-All-The-Whole-Dataset">Training The Network On All The Whole Dataset </a></li>
+<li class="toc-entry toc-h1"><a href="#So-What-Did-We-Do?">So What Did We Do? </a></li>
+<li class="toc-entry toc-h1"><a href="#What's-Next?">What&#39;s Next? </a></li>
+</ul><!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2021-02-28-MINST.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="What-I'm-Building">
+<a class="anchor" href="#What-I'm-Building" aria-hidden="true"><span class="octicon octicon-link"></span></a>What I'm Building<a class="anchor-link" href="#What-I'm-Building"> </a>
+</h1>
+<p>In this post I'm going to take an array of numbers in representing a handwritten digit and output a prediction of what digit it is.</p>
+<p>So what I'm going to build is a neural network taking a 1d array of numbers representing a digit from the famous MNIST data set.</p>
+<p>The MNIST dataset is an acronym that stands for the Modified National Institute of Standards and Technology dataset.</p>
+<p>It is a dataset of 60,000 small square 28×28 pixel grayscale images of handwritten single digits between 0 and 9.</p>
+<p>The task is to classify a given image of a handwritten digit into one of 10 classes representing integer values from 0 to 9, inclusively.</p>
+<p>I’m doing it all in Python.</p>
+<p>Let's get started.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="The-Code">
+<a class="anchor" href="#The-Code" aria-hidden="true"><span class="octicon octicon-link"></span></a>The Code<a class="anchor-link" href="#The-Code"> </a>
+</h1>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">itertools</span>
+
+<span class="kn">from</span> <span class="nn">keras.datasets</span> <span class="kn">import</span> <span class="n">mnist</span>
+
+<span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">),</span> <span class="p">(</span><span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span> <span class="o">=</span> <span class="n">mnist</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+
+<span class="n">images</span> <span class="o">=</span> <span class="n">x_train</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1000</span><span class="p">]</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="n">y_train</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1000</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">flatten_image</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">image</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">weighted_sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)):</span>
+        <span class="n">output</span> <span class="o">+=</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">output</span>
+
+<span class="k">def</span> <span class="nf">vector_matrix_multiplication</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">output</span><span class="p">)):</span>
+        <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="n">output</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">weighted_sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">output</span>
+
+<span class="k">def</span> <span class="nf">zeros_matrix</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rows</span><span class="p">):</span>
+        <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cols</span><span class="p">)])</span>
+    <span class="k">return</span> <span class="n">output</span>
+
+<span class="k">def</span> <span class="nf">outer_product</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">zeros_matrix</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)):</span>
+            <span class="n">output</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">b</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">output</span>
+
+<span class="k">class</span> <span class="nc">NeuralNet</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">[</span><span class="mf">0.0000</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)],</span>
+            <span class="p">[</span><span class="mf">0.0001</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)],</span>
+            <span class="p">[</span><span class="mf">0.0002</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)],</span>
+            <span class="p">[</span><span class="mf">0.0003</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)],</span>
+            <span class="p">[</span><span class="mf">0.0004</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)],</span>
+            <span class="p">[</span><span class="mf">0.0005</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)],</span>
+            <span class="p">[</span><span class="mf">0.0006</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)],</span>
+            <span class="p">[</span><span class="mf">0.0007</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)],</span>
+            <span class="p">[</span><span class="mf">0.0008</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)],</span>
+            <span class="p">[</span><span class="mf">0.0009</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)]</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.0000001</span>
+    
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">vector_matrix_multiplication</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">epochs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">input</span><span class="p">)):</span>
+                <span class="n">pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                
+                <span class="n">label</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                <span class="n">goal</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+                <span class="n">goal</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                                
+                <span class="n">error</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+                <span class="n">delta</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+
+                <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">goal</span><span class="p">)):</span>
+                    <span class="n">delta</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="n">pred</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">-</span> <span class="n">goal</span><span class="p">[</span><span class="n">a</span><span class="p">]</span>
+                    <span class="n">error</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="n">delta</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
+                
+                <span class="n">weight_deltas</span> <span class="o">=</span> <span class="n">outer_product</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="nb">input</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)):</span>
+                    <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">]</span> <span class="o">-=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">weight_deltas</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">])</span>
+
+<span class="c1"># Train on first image</span>
+<span class="n">first_image</span> <span class="o">=</span> <span class="n">images</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">first_label</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">input</span> <span class="o">=</span> <span class="p">[</span><span class="n">flatten_image</span><span class="p">(</span><span class="n">first_image</span><span class="p">)]</span>
+<span class="n">label</span> <span class="o">=</span> <span class="p">[</span><span class="n">first_label</span><span class="p">]</span>
+
+<span class="n">nn</span> <span class="o">=</span> <span class="n">NeuralNet</span><span class="p">()</span>
+<span class="n">nn</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+<span class="n">prediction</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"The label is: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">label</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="s2">". The prediction is: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">prediction</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">prediction</span><span class="p">))))</span>
+
+<span class="c1"># Train on full dataset</span>
+<span class="n">prepared_images</span> <span class="o">=</span> <span class="p">[</span><span class="n">flatten_image</span><span class="p">(</span><span class="n">image</span><span class="p">)</span> <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">images</span><span class="p">]</span>
+<span class="n">mm</span> <span class="o">=</span> <span class="n">NeuralNet</span><span class="p">()</span>
+<span class="n">mm</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">prepared_images</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="mi">45</span><span class="p">)</span>
+
+<span class="c1"># Test 1 prediction</span>
+<span class="n">prediction</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">prepared_images</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"That image is the number "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">prediction</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">prediction</span><span class="p">))))</span>
+
+<span class="c1"># Calculate accuracy</span>
+<span class="n">test_set</span> <span class="o">=</span> <span class="n">x_test</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">100</span><span class="p">]</span>
+<span class="n">test_labels</span> <span class="o">=</span> <span class="n">y_test</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">100</span><span class="p">]</span>
+<span class="n">num_correct</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">test_set</span><span class="p">)):</span>
+    <span class="n">prediction</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">flatten_image</span><span class="p">(</span><span class="n">test_set</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+    <span class="n">correct</span> <span class="o">=</span> <span class="n">test_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    
+    <span class="k">if</span> <span class="n">prediction</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">prediction</span><span class="p">))</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">correct</span><span class="p">):</span>
+        <span class="n">num_correct</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">num_correct</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">test_set</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"%"</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Get-Dataset">
+<a class="anchor" href="#Get-Dataset" aria-hidden="true"><span class="octicon octicon-link"></span></a>Get Dataset<a class="anchor-link" href="#Get-Dataset"> </a>
+</h1>
+<p>The keras library helpfully includes the data set so I can just import it from the library.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">keras.datasets</span> <span class="kn">import</span> <span class="n">mnist</span>
+
+<span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">),</span> <span class="p">(</span><span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span> <span class="o">=</span> <span class="n">mnist</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+
+<span class="n">images</span> <span class="o">=</span> <span class="n">x_train</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1000</span><span class="p">]</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="n">y_train</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1000</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>When I call <code>load_data()</code>, I get back two tuples: a training set and a test set. To successfully finishing training on my personal laptop, I need to limit the data set to the first 1000 elements. When I tried training on the full data set, it was still running after a full 24 hours and I had to kill the process to use my laptop :D.</p>
+<p>With only 1000 images, the best accuracy I achieved was 80%. Maybe you can tweak the numbers and get something better!</p>
+<p>Getting back to the data, if I take a look at one of the images in the training set, I see that it is an array of arrays - a matrix. The numbers range from 0 to 255 - each represent the greyscale value of the pixel at a particular position in the image.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">images</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>array([[  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0],
+       [  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0],
+       [  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0],
+       [  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0],
+       [  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0],
+       [  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   3,
+         18,  18,  18, 126, 136, 175,  26, 166, 255, 247, 127,   0,   0,
+          0,   0],
+       [  0,   0,   0,   0,   0,   0,   0,   0,  30,  36,  94, 154, 170,
+        253, 253, 253, 253, 253, 225, 172, 253, 242, 195,  64,   0,   0,
+          0,   0],
+       [  0,   0,   0,   0,   0,   0,   0,  49, 238, 253, 253, 253, 253,
+        253, 253, 253, 253, 251,  93,  82,  82,  56,  39,   0,   0,   0,
+          0,   0],
+       [  0,   0,   0,   0,   0,   0,   0,  18, 219, 253, 253, 253, 253,
+        253, 198, 182, 247, 241,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0],
+       [  0,   0,   0,   0,   0,   0,   0,   0,  80, 156, 107, 253, 253,
+        205,  11,   0,  43, 154,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0],
+       [  0,   0,   0,   0,   0,   0,   0,   0,   0,  14,   1, 154, 253,
+         90,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0],
+       [  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 139, 253,
+        190,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0],
+       [  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  11, 190,
+        253,  70,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0],
+       [  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  35,
+        241, 225, 160, 108,   1,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0],
+       [  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+         81, 240, 253, 253, 119,  25,   0,   0,   0,   0,   0,   0,   0,
+          0,   0],
+       [  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,  45, 186, 253, 253, 150,  27,   0,   0,   0,   0,   0,   0,
+          0,   0],
+       [  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0,  16,  93, 252, 253, 187,   0,   0,   0,   0,   0,   0,
+          0,   0],
+       [  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0,   0,   0, 249, 253, 249,  64,   0,   0,   0,   0,   0,
+          0,   0],
+       [  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,  46, 130, 183, 253, 253, 207,   2,   0,   0,   0,   0,   0,
+          0,   0],
+       [  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  39,
+        148, 229, 253, 253, 253, 250, 182,   0,   0,   0,   0,   0,   0,
+          0,   0],
+       [  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  24, 114, 221,
+        253, 253, 253, 253, 201,  78,   0,   0,   0,   0,   0,   0,   0,
+          0,   0],
+       [  0,   0,   0,   0,   0,   0,   0,   0,  23,  66, 213, 253, 253,
+        253, 253, 198,  81,   2,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0],
+       [  0,   0,   0,   0,   0,   0,  18, 171, 219, 253, 253, 253, 253,
+        195,  80,   9,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0],
+       [  0,   0,   0,   0,  55, 172, 226, 253, 253, 253, 253, 244, 133,
+         11,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0],
+       [  0,   0,   0,   0, 136, 253, 253, 253, 212, 135, 132,  16,   0,
+          0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0],
+       [  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0],
+       [  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0],
+       [  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0]], dtype=uint8)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>If I look at the first label, I see the number five. This means that the collection of numbers in images[0] represents is the number 5.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">labels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>5</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Prepare-Data">
+<a class="anchor" href="#Prepare-Data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Prepare Data<a class="anchor-link" href="#Prepare-Data"> </a>
+</h1>
+<p>Now, the matrix math that I implemented does not know how to handle arrays of arrays so, the first thing I do is prepare the data by flattening the image into a single array.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">itertools</span>
+
+<span class="k">def</span> <span class="nf">flatten_image</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">image</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>What I'm doing in this function is using the <code>itertools</code> library to flatten the array. Specifically, I'm using the <code>.chain()</code> method to give me one element at a time and then I use the <code>list()</code> function to create a flat list to return.</p>
+<p>When I print the first image, I see that all the numbers are in one flat array.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">flatten_image</span><span class="p">(</span><span class="n">images</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 18, 18, 18, 126, 136, 175, 26, 166, 255, 247, 127, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 36, 94, 154, 170, 253, 253, 253, 253, 253, 225, 172, 253, 242, 195, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 238, 253, 253, 253, 253, 253, 253, 253, 253, 251, 93, 82, 82, 56, 39, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 219, 253, 253, 253, 253, 253, 198, 182, 247, 241, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 80, 156, 107, 253, 253, 205, 11, 0, 43, 154, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 1, 154, 253, 90, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 139, 253, 190, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 190, 253, 70, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 35, 241, 225, 160, 108, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 81, 240, 253, 253, 119, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 45, 186, 253, 253, 150, 27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 93, 252, 253, 187, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 249, 253, 249, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 46, 130, 183, 253, 253, 207, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 39, 148, 229, 253, 253, 253, 250, 182, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 114, 221, 253, 253, 253, 253, 201, 78, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 66, 213, 253, 253, 253, 253, 198, 81, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 171, 219, 253, 253, 253, 253, 195, 80, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 55, 172, 226, 253, 253, 253, 253, 244, 133, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 136, 253, 253, 253, 212, 135, 132, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Matrix-Math-Helper-Functions">
+<a class="anchor" href="#Matrix-Math-Helper-Functions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Matrix Math Helper Functions<a class="anchor-link" href="#Matrix-Math-Helper-Functions"> </a>
+</h1>
+<p>Now that I've prepared the data, I can move on to the next step - implement matrix math.</p>
+<p>Since I'm working with arrays, I need math functions which understand arrays. You may remember that a neural network makes predictions by multiplying the input by the weights. So one thing I need to do now is figure out how to do matrix multiplication.</p>
+<p>In order to do matrix multipliation, I need a method to calculate weighted sums.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">weighted_sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)):</span>
+        <span class="n">output</span> <span class="o">+=</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">output</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The weighted sum takes each array takes two arrays of the same length. And multiplies each number in the same index, as an all together to give you a single number. So the weighted sum takes two arrays and gives you back a single number.</p>
+<p>The best way to think about what this single number represents is as a score of similarity between two arrays. The higher the weighted sum, the more similar arrays <code>a</code> and <code>b</code> are to each other. Roughly speaking, the neural network will give higher scores to inputs that are more similar to its weights.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">vector_matrix_multiplication</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">output</span><span class="p">)):</span>
+        <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="n">output</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">weighted_sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">output</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Next, I have the matrix multiplication method. This calculates the weighted sum between weight and input for each position in the array. When it's done, I get an array of weighted sums. And in my particular case, the output has 10 elements and each element in the array represents a digit.</p>
+<p>In my case, the returned output of 10 elements contain the probability of which digit the input represents. Whichever index has the highest number is the prediction for what digit is in the image.</p>
+<p>I need two other matrix math helpers. These functions will be used to adjust the weights in the right direction.</p>
+<p>First, I have a zeros matrix method which creates a matrix filled with zeros.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">zeros_matrix</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rows</span><span class="p">):</span>
+        <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cols</span><span class="p">)])</span>
+    <span class="k">return</span> <span class="n">output</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This is useful in our function to calculate the outer product of two matrices.</p>
+<p>The outer product does an elementwise multiplication between two matricies. This will be used to tell the neural network how to change its weights.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">outer_product</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">zeros_matrix</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)):</span>
+            <span class="n">output</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">b</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">output</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Okay. That's a lot of math. Let's find out how these functions are being used in the neural network.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Neural-Network">
+<a class="anchor" href="#Neural-Network" aria-hidden="true"><span class="octicon octicon-link"></span></a>Neural Network<a class="anchor-link" href="#Neural-Network"> </a>
+</h1>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">NeuralNet</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">[</span><span class="mf">0.0000</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)],</span>
+            <span class="p">[</span><span class="mf">0.0001</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)],</span>
+            <span class="p">[</span><span class="mf">0.0002</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)],</span>
+            <span class="p">[</span><span class="mf">0.0003</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)],</span>
+            <span class="p">[</span><span class="mf">0.0004</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)],</span>
+            <span class="p">[</span><span class="mf">0.0005</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)],</span>
+            <span class="p">[</span><span class="mf">0.0006</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)],</span>
+            <span class="p">[</span><span class="mf">0.0007</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)],</span>
+            <span class="p">[</span><span class="mf">0.0008</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)],</span>
+            <span class="p">[</span><span class="mf">0.0009</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)]</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.0000001</span>
+    
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">vector_matrix_multiplication</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">epochs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">input</span><span class="p">)):</span>
+                <span class="n">pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                
+                <span class="n">label</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                <span class="n">goal</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+                <span class="n">goal</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                                
+                <span class="n">error</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+                <span class="n">delta</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+
+                <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">goal</span><span class="p">)):</span>
+                    <span class="n">delta</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="n">pred</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">-</span> <span class="n">goal</span><span class="p">[</span><span class="n">a</span><span class="p">]</span>
+                    <span class="n">error</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="n">delta</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
+                
+                <span class="n">weight_deltas</span> <span class="o">=</span> <span class="n">outer_product</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="nb">input</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)):</span>
+                    <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">]</span> <span class="o">-=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">weight_deltas</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">])</span>
+    
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This neural network is similar to the one from <a href="https://leogau.dev/2021/01/22/How-I-Implemented-The-Most-Simple-Neural-Net.html">the previous post</a>. The only real difference is that we're using an array of numbers instead of a single number.</p>
+<p>In the initializer, I have the weights and the alpha. I've initialized each weight array to have <code>784</code> elements of an initial number. <code>784</code> is the number of pixels in the image.</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">[</span><span class="mf">0.0000</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)],</span>
+        <span class="p">[</span><span class="mf">0.0001</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)],</span>
+        <span class="p">[</span><span class="mf">0.0002</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)],</span>
+        <span class="p">[</span><span class="mf">0.0003</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)],</span>
+        <span class="p">[</span><span class="mf">0.0004</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)],</span>
+        <span class="p">[</span><span class="mf">0.0005</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)],</span>
+        <span class="p">[</span><span class="mf">0.0006</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)],</span>
+        <span class="p">[</span><span class="mf">0.0007</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)],</span>
+        <span class="p">[</span><span class="mf">0.0008</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)],</span>
+        <span class="p">[</span><span class="mf">0.0009</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">784</span><span class="p">)]</span>
+    <span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.0000001</span>
+</pre></div>
+<p>The prediction function is again multplying the input by the weights.</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">vector_matrix_multiplication</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span>
+</pre></div>
+<p>The training function iterates through the dataset an <code>epoch</code> number of times.</p>
+<div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">input</span><span class="p">)):</span>
+</pre></div>
+<p>For each image, it makes a prediction</p>
+<div class="highlight"><pre><span></span><span class="n">pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+</pre></div>
+<p>Next we transform the label into a format that the neural network expects.</p>
+<div class="highlight"><pre><span></span><span class="n">label</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+<span class="n">goal</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+<span class="n">goal</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+<p>I create an array of ten 0s and then set the index of the goal prediction to 1. So all the wrong answers are 0 and the right answer is 1.</p>
+<p>Next, I calculate the error and the delta.</p>
+<div class="highlight"><pre><span></span><span class="n">error</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+<span class="n">delta</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+
+<span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">goal</span><span class="p">)):</span>
+    <span class="n">delta</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="n">pred</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">-</span> <span class="n">goal</span><span class="p">[</span><span class="n">a</span><span class="p">]</span>
+    <span class="n">error</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="n">delta</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
+</pre></div>
+<p>I then calculate the weight deltas by using an outer product between delta and the input.</p>
+<div class="highlight"><pre><span></span><span class="n">weight_deltas</span> <span class="o">=</span> <span class="n">outer_product</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="nb">input</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+</pre></div>
+<p>Finally I update all the weights by multiplying the weight deltas by the alpha.</p>
+<div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)):</span>
+    <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">]</span> <span class="o">-=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">weight_deltas</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">])</span>
+</pre></div>
+<p>The main takeaway here is that this is exactly like the neural network with one digit. The only difference is that the math is done on arrays instead of on single numbers.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Training-The-Network-On-The-First-Data-Point">
+<a class="anchor" href="#Training-The-Network-On-The-First-Data-Point" aria-hidden="true"><span class="octicon octicon-link"></span></a>Training The Network On The First Data Point<a class="anchor-link" href="#Training-The-Network-On-The-First-Data-Point"> </a>
+</h1>
+<p>Let's put this new network into action. To test it out, I take take the first image and the first label. I create a neural network train it on that image and label for five epochs. When I predict the digit on that same image, I see the output array is an array of 10 numbers.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">first_image</span> <span class="o">=</span> <span class="n">images</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">first_label</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">input</span> <span class="o">=</span> <span class="p">[</span><span class="n">flatten_image</span><span class="p">(</span><span class="n">first_image</span><span class="p">)]</span>
+<span class="n">label</span> <span class="o">=</span> <span class="p">[</span><span class="n">first_label</span><span class="p">]</span>
+
+<span class="n">nn</span> <span class="o">=</span> <span class="n">NeuralNet</span><span class="p">()</span>
+<span class="n">nn</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+<span class="n">prediction</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"The label is: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">label</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="s2">". The prediction is: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">prediction</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">prediction</span><span class="p">))))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[0.0, 0.03036370905054081, 0.06072741810108162, 0.09109112715162263, 0.12145483620216324, 1.1407872249800253, 0.18218225430324525, 0.21254596335378556, 0.24290967240432648, 0.2732733814548679]
+The label is: 5. The prediction is: 5
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The number in index five is the greatest, so the network correctly identified the handwritten number of the number <code>5</code>.</p>
+<p>It works on one data point but what about the entire data set?</p>
+<p>Let's do that next.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Training-The-Network-On-All-The-Whole-Dataset">
+<a class="anchor" href="#Training-The-Network-On-All-The-Whole-Dataset" aria-hidden="true"><span class="octicon octicon-link"></span></a>Training The Network On All The Whole Dataset<a class="anchor-link" href="#Training-The-Network-On-All-The-Whole-Dataset"> </a>
+</h1>
+<p>I prepare the images by flattening every image in our data set. Again, this is the first 1000 from the MNIST dataset. I create the neural network, giving it the prepared images and labels.</p>
+<p>I run it for 45 epochs. Through trial and error I found that 45 epochs gives me the highest accuracy of just under 75%.</p>
+<p>When it's finished, I test the network by making a prediction on a random image. It correctly identified the image.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">prepared_images</span> <span class="o">=</span> <span class="p">[</span><span class="n">flatten_image</span><span class="p">(</span><span class="n">image</span><span class="p">)</span> <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">images</span><span class="p">]</span>
+
+<span class="n">mm</span> <span class="o">=</span> <span class="n">NeuralNet</span><span class="p">()</span>
+<span class="n">mm</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">prepared_images</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+<span class="n">prediction</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">prepared_images</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"That image is the number "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">prediction</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">prediction</span><span class="p">))))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>That image is the number 1
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">labels</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>1</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To test the true accuracy, I use the first 100 test data and labels.</p>
+<p>I run through a loop of the test set, make a prediction, checking its accuracy, and counting the number correct.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">test_set</span> <span class="o">=</span> <span class="n">x_test</span>
+<span class="n">test_labels</span> <span class="o">=</span> <span class="n">y_test</span>
+<span class="n">num_correct</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">test_set</span><span class="p">)):</span>
+    <span class="n">prediction</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">flatten_image</span><span class="p">(</span><span class="n">test_set</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+    <span class="n">correct</span> <span class="o">=</span> <span class="n">test_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">prediction</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">prediction</span><span class="p">))</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">correct</span><span class="p">):</span>
+        <span class="n">num_correct</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">num_correct</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">test_set</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"%"</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>74.47%
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In the end, I'm able to correctly predict 3 out of every 4 images in the test set.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="So-What-Did-We-Do?">
+<a class="anchor" href="#So-What-Did-We-Do?" aria-hidden="true"><span class="octicon octicon-link"></span></a>So What Did We Do?<a class="anchor-link" href="#So-What-Did-We-Do?"> </a>
+</h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>So, that's that. This was a fun little exercise to see how neural networks use matrix math to make predictions.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="What's-Next?">
+<a class="anchor" href="#What's-Next?" aria-hidden="true"><span class="octicon octicon-link"></span></a>What's Next?<a class="anchor-link" href="#What's-Next?"> </a>
+</h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In the next post, I’ll experiment with adding multiple layers to make the network "deep". I'll also swap my handwritten matrix math functions for NumPy functions and see how much easier it makes some of this for me.</p>
+<p>See you next time!</p>
+
+</div>
+</div>
+</div>
+</div>
+
+
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="leogau/leogau.dev"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/2021/02/28/MINST.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>Exploring Deep Learning</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/leogau" title="leogau"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/leogau" title="leogau"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
