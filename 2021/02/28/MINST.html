@@ -148,11 +148,9 @@ window.onload = wrap_img;
 <h1 id="What-I'm-Building">
 <a class="anchor" href="#What-I'm-Building" aria-hidden="true"><span class="octicon octicon-link"></span></a>What I'm Building<a class="anchor-link" href="#What-I'm-Building"> </a>
 </h1>
-<p>In this post I'm going to take an array of numbers in representing a handwritten digit and output a prediction of what digit it is.</p>
-<p>So what I'm going to build is a neural network taking a 1d array of numbers representing a digit from the famous MNIST data set.</p>
-<p>The MNIST dataset is an acronym that stands for the Modified National Institute of Standards and Technology dataset.</p>
-<p>It is a dataset of 60,000 small square 28×28 pixel grayscale images of handwritten single digits between 0 and 9.</p>
-<p>The task is to classify a given image of a handwritten digit into one of 10 classes representing integer values from 0 to 9, inclusively.</p>
+<p>In this post I'll show you how I built a neural network which take an array of numbers representing a handwritten digit and output a prediction of what digit it is.</p>
+<p>The handwritten digits are from the famous MNIST dataset. The Modified National Institute of Standards and Technology (MNIST) dataset is a collection of 60,000 small, square 28×28 pixel grayscale images of handwritten single digits between 0 and 9.</p>
+<p>The task is to classify a given image into one of the 10 digits.</p>
 <p>I’m doing it all in Python.</p>
 <p>Let's get started.</p>
 
@@ -304,7 +302,7 @@ window.onload = wrap_img;
 <h1 id="Get-Dataset">
 <a class="anchor" href="#Get-Dataset" aria-hidden="true"><span class="octicon octicon-link"></span></a>Get Dataset<a class="anchor-link" href="#Get-Dataset"> </a>
 </h1>
-<p>The keras library helpfully includes the data set so I can just import it from the library.</p>
+<p>The <code>keras</code> library helpfully includes the dataset so I can import it from the library.</p>
 
 </div>
 </div>
@@ -334,9 +332,9 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>When I call <code>load_data()</code>, I get back two tuples: a training set and a test set. To successfully finishing training on my personal laptop, I need to limit the data set to the first 1000 elements. When I tried training on the full data set, it was still running after a full 24 hours and I had to kill the process to use my laptop :D.</p>
-<p>With only 1000 images, the best accuracy I achieved was 80%. Maybe you can tweak the numbers and get something better!</p>
-<p>Getting back to the data, if I take a look at one of the images in the training set, I see that it is an array of arrays - a matrix. The numbers range from 0 to 255 - each represent the greyscale value of the pixel at a particular position in the image.</p>
+<p>When I call <code>load_data()</code>, I get back two tuples: a training set and a test set. To successfully finishing training on my personal laptop, I had to limit the data to the first 1000 elements. When I tried training on the full data set, it was hadn't finished after a full 24 hours and I had to kill the process to use my laptop :D.</p>
+<p>With only 1000 images, the best accuracy I achieved was about 75%. Maybe you can tweak the numbers and get something better!</p>
+<p>Getting back to the data, if I take a look at one of the images in the training set, I see that it is an array of arrays - a matrix. The numbers range from 0 to 255 - each representing the greyscale value of the pixel at a particular position in the image.</p>
 
 </div>
 </div>
@@ -504,7 +502,7 @@ window.onload = wrap_img;
 <h1 id="Prepare-Data">
 <a class="anchor" href="#Prepare-Data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Prepare Data<a class="anchor-link" href="#Prepare-Data"> </a>
 </h1>
-<p>Now, the matrix math that I implemented does not know how to handle arrays of arrays so, the first thing I do is prepare the data by flattening the image into a single array.</p>
+<p>The matrix math that I implement does not know how to handle an array of arrays so, the first thing I do is prepare the data by flattening the image into a single array.</p>
 
 </div>
 </div>
@@ -532,7 +530,7 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>What I'm doing in this function is using the <code>itertools</code> library to flatten the array. Specifically, I'm using the <code>.chain()</code> method to give me one element at a time and then I use the <code>list()</code> function to create a flat list to return.</p>
+<p>What I'm doing in this function is using the <code>itertools</code> library to flatten the array. Specifically, I'm using the <code>.chain.from_iterable()</code> method to give me one element at a time. Then I use the <code>list()</code> function to create a flat list to return.</p>
 <p>When I print the first image, I see that all the numbers are in one flat array.</p>
 
 </div>
@@ -576,7 +574,7 @@ window.onload = wrap_img;
 <a class="anchor" href="#Matrix-Math-Helper-Functions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Matrix Math Helper Functions<a class="anchor-link" href="#Matrix-Math-Helper-Functions"> </a>
 </h1>
 <p>Now that I've prepared the data, I can move on to the next step - implement matrix math.</p>
-<p>Since I'm working with arrays, I need math functions which understand arrays. You may remember that a neural network makes predictions by multiplying the input by the weights. So one thing I need to do now is figure out how to do matrix multiplication.</p>
+<p>Since I'm working with arrays, I need math functions which understand arrays. You may remember from <a href="https://leogau.dev/2021/01/22/How-I-Implemented-The-Most-Simple-Neural-Net.html">the previous post</a> that a neural network makes predictions by multiplying the input by the weights. So one thing I need to do now is figure out how to do matrix multiplication.</p>
 <p>In order to do matrix multipliation, I need a method to calculate weighted sums.</p>
 
 </div>
@@ -607,7 +605,7 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The weighted sum takes each array takes two arrays of the same length. And multiplies each number in the same index, as an all together to give you a single number. So the weighted sum takes two arrays and gives you back a single number.</p>
+<p>The weighted sum function takes two arrays of the same length. It multiplies each number in the same index and adds the result to a running sum. So the weighted sum takes two arrays and gives you back a single number.</p>
 <p>The best way to think about what this single number represents is as a score of similarity between two arrays. The higher the weighted sum, the more similar arrays <code>a</code> and <code>b</code> are to each other. Roughly speaking, the neural network will give higher scores to inputs that are more similar to its weights.</p>
 
 </div>
@@ -638,7 +636,7 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Next, I have the matrix multiplication method. This calculates the weighted sum between weight and input for each position in the array. When it's done, I get an array of weighted sums. And in my particular case, the output has 10 elements and each element in the array represents a digit.</p>
+<p>Next, I have the matrix multiplication method. This calculates the weighted sum between weight and input for each position in the array. When it's done, I get an array of weighted sums.</p>
 <p>In my case, the returned output of 10 elements contain the probability of which digit the input represents. Whichever index has the highest number is the prediction for what digit is in the image.</p>
 <p>I need two other matrix math helpers. These functions will be used to adjust the weights in the right direction.</p>
 <p>First, I have a zeros matrix method which creates a matrix filled with zeros.</p>
@@ -670,7 +668,7 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>This is useful in our function to calculate the outer product of two matrices.</p>
+<p>This is used to implement a function to calculate the outer product of two matrices.</p>
 <p>The outer product does an elementwise multiplication between two matricies. This will be used to tell the neural network how to change its weights.</p>
 
 </div>
@@ -820,7 +818,7 @@ window.onload = wrap_img;
 <p>I then calculate the weight deltas by using an outer product between delta and the input.</p>
 <div class="highlight"><pre><span></span><span class="n">weight_deltas</span> <span class="o">=</span> <span class="n">outer_product</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="nb">input</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
 </pre></div>
-<p>Finally I update all the weights by multiplying the weight deltas by the alpha.</p>
+<p>Finally I update all the weights using the weight deltas.</p>
 <div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)):</span>
     <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">]</span> <span class="o">-=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">weight_deltas</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">])</span>
@@ -836,7 +834,7 @@ window.onload = wrap_img;
 <h1 id="Training-The-Network-On-The-First-Data-Point">
 <a class="anchor" href="#Training-The-Network-On-The-First-Data-Point" aria-hidden="true"><span class="octicon octicon-link"></span></a>Training The Network On The First Data Point<a class="anchor-link" href="#Training-The-Network-On-The-First-Data-Point"> </a>
 </h1>
-<p>Let's put this new network into action. To test it out, I take take the first image and the first label. I create a neural network train it on that image and label for five epochs. When I predict the digit on that same image, I see the output array is an array of 10 numbers.</p>
+<p>Let's put this new network into action. To test it out, I take take the first image and the first label. I create a neural network and train it on that first image and label for five epochs. When I predict the digit on that same image, I see the output array is an array of 10 numbers.</p>
 
 </div>
 </div>
@@ -900,7 +898,7 @@ The label is: 5. The prediction is: 5
 <a class="anchor" href="#Training-The-Network-On-All-The-Whole-Dataset" aria-hidden="true"><span class="octicon octicon-link"></span></a>Training The Network On All The Whole Dataset<a class="anchor-link" href="#Training-The-Network-On-All-The-Whole-Dataset"> </a>
 </h1>
 <p>I prepare the images by flattening every image in our data set. Again, this is the first 1000 from the MNIST dataset. I create the neural network, giving it the prepared images and labels.</p>
-<p>I run it for 45 epochs. Through trial and error I found that 45 epochs gives me the highest accuracy of just under 75%.</p>
+<p>I run it for 5 epochs. Through trial and error I found that 5 epochs gives me the highest accuracy of just under 75%.</p>
 <p>When it's finished, I test the network by making a prediction on a random image. It correctly identified the image.</p>
 
 </div>
@@ -979,7 +977,7 @@ The label is: 5. The prediction is: 5
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>To test the true accuracy, I use the first 100 test data and labels.</p>
+<p>To test the true accuracy, I use the test data and labels.</p>
 <p>I run through a loop of the test set, make a prediction, checking its accuracy, and counting the number correct.</p>
 
 </div>
@@ -1045,7 +1043,7 @@ The label is: 5. The prediction is: 5
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>So, that's that. This was a fun little exercise to see how neural networks use matrix math to make predictions.</p>
+<p>This was a fun little exercise to see how neural networks use matrix math to make predictions.</p>
 
 </div>
 </div>
