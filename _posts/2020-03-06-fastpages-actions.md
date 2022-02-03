@@ -3,6 +3,7 @@ title: "GitHub Actions: Providing Data Scientists With New Superpowers"
 description: A Tutorial on GitHub <a href="https://github.com/features/actions">Actions</a> For Data Scientists
 toc: true
 comments: true
+hide: true
 layout: post
 categories: [actions, markdown]
 image: images/fastpages_posts/actions/actions_logo.png
@@ -11,7 +12,7 @@ author: Hamel Husain & Jeremy Howard
 
 # What Superpowers?
 
-Hi, I'm [Hamel Husain](https://twitter.com/HamelHusain).  I'm a machine learning engineer at GitHub.  Recently, GitHub released a new product called [GitHub Actions](https://github.com/features/actions), which has mostly flown under the radar in the machine learning and data science community as just another continuous integration tool.  
+Hi, I'm [Hamel Husain](https://twitter.com/HamelHusain).  I'm a machine learning engineer at GitHub.  Recently, GitHub released a new product called [GitHub Actions](https://github.com/features/actions), which has mostly flown under the radar in the machine learning and data science community as just another continuous integration tool.
 
 Recently, I've been able to use GitHub Actions to build some very unique tools for Data Scientists, which I want to share with you today.  Most importantly, I hope to get you excited about GitHub Actions, and the promise it has for giving you new superpowers as a Data Scientist.  Here are two projects I recently built with Actions that show off its potential:
 
@@ -114,7 +115,7 @@ on:
   push:
     branches:
       - master
-  pull_request: 
+  pull_request:
 ```
 
 This means that this workflow is triggered on either a [push](https://help.github.com/en/actions/reference/events-that-trigger-workflows#push-event-push) or [pull request](https://help.github.com/en/actions/reference/events-that-trigger-workflows#pull-request-event-pull_request) event.  Furthermore, push events are filtered such that only pushes to the master branch will trigger the workflow, whereas all pull requests will trigger this workflow.  It is important to note that pull requests opened from forks will have read-only access to the base repository and cannot access any secrets for security reasons.  The reason for defining the workflow in this way is we wanted to trigger the same workflow to test pull requests as well as build and deploy the website when a PR is merged into master.  This will be clarified as we step through the rest of the YAML file.
@@ -123,10 +124,10 @@ This means that this workflow is triggered on either a [push](https://help.githu
 
 Next, we define jobs (there is only one in this workflow).  Per [the docs](https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobs):
 
-> A workflow run is made up of one or more jobs. Jobs run in parallel by default. 
+> A workflow run is made up of one or more jobs. Jobs run in parallel by default.
 
 ```yaml
-jobs:     
+jobs:
   build-site:
     if: ( github.event.commits[0].message != 'Initial commit' ) || github.run_number > 1
     runs-on: ubuntu-latest
@@ -195,7 +196,7 @@ Below are the first two steps [in our workflow](https://github.com/fastai/fastpa
      uses: ./_action_files
 ```
 
-The first step creates a copy of your repository in the Actions file system, with the help of the utility [action/checkout](https://github.com/actions/checkout).  This utility only fetches the last commit by default and saves files into a directory (whose path is stored in the environment variable [GITHUB_WORKSPACE](https://help.github.com/en/actions/configuring-and-managing-workflows/using-environment-variables) that is accessible by subsequent steps in your job.  The second step runs the [fastai/fastpages](https://github.com/fastai/fastpages#using-the-github-action--your-own-custom-blog) Action, which converts notebooks and word documents to blog posts automatically.  In this case, the syntax: 
+The first step creates a copy of your repository in the Actions file system, with the help of the utility [action/checkout](https://github.com/actions/checkout).  This utility only fetches the last commit by default and saves files into a directory (whose path is stored in the environment variable [GITHUB_WORKSPACE](https://help.github.com/en/actions/configuring-and-managing-workflows/using-environment-variables) that is accessible by subsequent steps in your job.  The second step runs the [fastai/fastpages](https://github.com/fastai/fastpages#using-the-github-action--your-own-custom-blog) Action, which converts notebooks and word documents to blog posts automatically.  In this case, the syntax:
 
 ```yaml
 uses: ./_action_files
@@ -217,16 +218,16 @@ The next three steps in our workflow are defined below:
         args: bash -c "gem install bundler && jekyll build -V"
       env:
         JEKYLL_ENV: 'production'
-  
+
     - name: copy CNAME file into _site if CNAME exists
       run: |
         sudo chmod -R 777 _site/
         cp CNAME _site/ 2>/dev/null || :
 ```
 
-The step named `setup directories for Jekyll build` executes shell commands that remove the `_site` folder in order to get rid of stale files related to the page we want to build, as well as grant permissions to all the files in our repo to subsequent steps. 
+The step named `setup directories for Jekyll build` executes shell commands that remove the `_site` folder in order to get rid of stale files related to the page we want to build, as well as grant permissions to all the files in our repo to subsequent steps.
 
-The step named `Jekyll build` executes a docker container hosted by the Jekyll community [on Dockerhub called `jekyll/jekyll`](https://hub.docker.com/r/jekyll/jekyll/).  For those not familiar with Docker, see [this tutorial](https://towardsdatascience.com/how-docker-can-help-you-become-a-more-effective-data-scientist-7fc048ef91d5?source=friends_link&sk=c554b55109102d47145c4b3381bee3ee).  The name of this container is called `fastai/fastpages-jekyll` because I'm adding some additional dependencies to `jekyll/jekyll` and hosting those on my DockerHub account for faster build times[^2].  The [args parameter](https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idstepswithargs) allows you to execute arbitrary commands with the Docker container by overriding the CMD instruction in the Dockerfile.  We use this Docker container hosted on Dockerhub so we don’t have to deal with installing and configuring all of the complicated dependencies for Jekyll.  The files from our repo are already available in the Actions runtime due to the first step in this workflow, and are mounted into this Docker container automatically for us.  In this case, we are running the command `jekyll build`, which builds our website and places relevant assets them into the `_site` folder. For more information about Jekyll, [read the official docs](https://jekyllrb.com/docs/).  Finally, the `env` parameter allows me to pass an environment variable into the Docker container. 
+The step named `Jekyll build` executes a docker container hosted by the Jekyll community [on Dockerhub called `jekyll/jekyll`](https://hub.docker.com/r/jekyll/jekyll/).  For those not familiar with Docker, see [this tutorial](https://towardsdatascience.com/how-docker-can-help-you-become-a-more-effective-data-scientist-7fc048ef91d5?source=friends_link&sk=c554b55109102d47145c4b3381bee3ee).  The name of this container is called `fastai/fastpages-jekyll` because I'm adding some additional dependencies to `jekyll/jekyll` and hosting those on my DockerHub account for faster build times[^2].  The [args parameter](https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idstepswithargs) allows you to execute arbitrary commands with the Docker container by overriding the CMD instruction in the Dockerfile.  We use this Docker container hosted on Dockerhub so we don’t have to deal with installing and configuring all of the complicated dependencies for Jekyll.  The files from our repo are already available in the Actions runtime due to the first step in this workflow, and are mounted into this Docker container automatically for us.  In this case, we are running the command `jekyll build`, which builds our website and places relevant assets them into the `_site` folder. For more information about Jekyll, [read the official docs](https://jekyllrb.com/docs/).  Finally, the `env` parameter allows me to pass an environment variable into the Docker container.
 
 The final command above copies a `CNAME` file into the _site folder, which we need for the custom domain [https://fastpages.fast.ai](https://fastpages.fast.ai/). Setting up custom domains are outside the scope of this article.
 
@@ -247,13 +248,13 @@ The statement
 ```yaml
 if: github.event_name == 'push'
 ```
-uses the variable [github.event_name](https://help.github.com/en/actions/reference/contexts-and-expression-syntax-for-github-actions#github-context) to ensure this step only runs when a push event ( in this case only pushes to the master branch trigger this workflow) occur.  
+uses the variable [github.event_name](https://help.github.com/en/actions/reference/contexts-and-expression-syntax-for-github-actions#github-context) to ensure this step only runs when a push event ( in this case only pushes to the master branch trigger this workflow) occur.
 
 This step deploys the fastpages website by copying the contents of the `_site` folder to the root of the `gh-pages` branch, which [GitHub Pages](https://pages.github.com/) uses for hosting.  This step uses the [peaceiris/actions-gh-pages](https://github.com/peaceiris/actions-gh-pages) Action, pinned at version 3.  [Their README](https://github.com/peaceiris/actions-gh-pages) describes various options and inputs for this Action.
 
 # Conclusion
 
-We hope that this has shed some light on how we use GitHub Actions to automate fastpages.  While we only covered one workflow above, we hope this provides enough intuition to understand the [other workflows](https://github.com/fastai/fastpages/tree/master/.github/workflows) in fastpages.  We have only scratched the surface of GitHub Actions in this blog post, but we provide other materials below for those who want to dive in deeper.  We have not covered how to host an Action for other people, but you can [start with these docs](https://help.github.com/en/actions/building-actions) to learn more. 
+We hope that this has shed some light on how we use GitHub Actions to automate fastpages.  While we only covered one workflow above, we hope this provides enough intuition to understand the [other workflows](https://github.com/fastai/fastpages/tree/master/.github/workflows) in fastpages.  We have only scratched the surface of GitHub Actions in this blog post, but we provide other materials below for those who want to dive in deeper.  We have not covered how to host an Action for other people, but you can [start with these docs](https://help.github.com/en/actions/building-actions) to learn more.
 
 Still confused about how GitHub Actions could be used for Data Science?  Here are some ideas of things you can build:
 
