@@ -18,7 +18,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2020-03-06T00:00:00-06:00" />
 <script type="application/ld+json">
-{"dateModified":"2020-03-06T00:00:00-06:00","datePublished":"2020-03-06T00:00:00-06:00","url":"https://leogau.dev/2020/03/06/fastpages-actions.html","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://leogau.dev/2020/03/06/fastpages-actions.html"},"headline":"GitHub Actions: Providing Data Scientists With New Superpowers","image":"https://leogau.dev/images/fastpages_posts/actions/actions_logo.png","author":{"@type":"Person","name":"Hamel Husain & Jeremy Howard"},"description":"A Tutorial on GitHub Actions For Data Scientists","@context":"https://schema.org"}</script>
+{"url":"https://leogau.dev/2020/03/06/fastpages-actions.html","@type":"BlogPosting","headline":"GitHub Actions: Providing Data Scientists With New Superpowers","dateModified":"2020-03-06T00:00:00-06:00","datePublished":"2020-03-06T00:00:00-06:00","image":"https://leogau.dev/images/fastpages_posts/actions/actions_logo.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://leogau.dev/2020/03/06/fastpages-actions.html"},"author":{"@type":"Person","name":"Hamel Husain & Jeremy Howard"},"description":"A Tutorial on GitHub Actions For Data Scientists","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://leogau.dev/feed.xml" title="Leo Gau" /><!-- the google_analytics_id gets auto inserted from the config file -->
 
@@ -276,7 +276,7 @@ window.onload = wrap_img;
   <span class="na">push</span><span class="pi">:</span>
     <span class="na">branches</span><span class="pi">:</span>
       <span class="pi">-</span> <span class="s">master</span>
-  <span class="na">pull_request</span><span class="pi">:</span> 
+  <span class="na">pull_request</span><span class="pi">:</span>
 </code></pre></div></div>
 
 <p>This means that this workflow is triggered on either a <a href="https://help.github.com/en/actions/reference/events-that-trigger-workflows#push-event-push">push</a> or <a href="https://help.github.com/en/actions/reference/events-that-trigger-workflows#pull-request-event-pull_request">pull request</a> event.  Furthermore, push events are filtered such that only pushes to the master branch will trigger the workflow, whereas all pull requests will trigger this workflow.  It is important to note that pull requests opened from forks will have read-only access to the base repository and cannot access any secrets for security reasons.  The reason for defining the workflow in this way is we wanted to trigger the same workflow to test pull requests as well as build and deploy the website when a PR is merged into master.  This will be clarified as we step through the rest of the YAML file.</p>
@@ -290,7 +290,7 @@ window.onload = wrap_img;
   <p>A workflow run is made up of one or more jobs. Jobs run in parallel by default.</p>
 </blockquote>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">jobs</span><span class="pi">:</span>     
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">jobs</span><span class="pi">:</span>
   <span class="na">build-site</span><span class="pi">:</span>
     <span class="na">if</span><span class="pi">:</span> <span class="s">( github.event.commits[0].message != 'Initial commit' ) || github.run_number &gt; </span><span class="m">1</span>
     <span class="na">runs-on</span><span class="pi">:</span> <span class="s">ubuntu-latest</span>
@@ -380,7 +380,7 @@ window.onload = wrap_img;
         <span class="na">args</span><span class="pi">:</span> <span class="s">bash -c "gem install bundler &amp;&amp; jekyll build -V"</span>
       <span class="na">env</span><span class="pi">:</span>
         <span class="na">JEKYLL_ENV</span><span class="pi">:</span> <span class="s1">'</span><span class="s">production'</span>
-  
+
     <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">copy CNAME file into _site if CNAME exists</span>
       <span class="na">run</span><span class="pi">:</span> <span class="pi">|</span>
         <span class="s">sudo chmod -R 777 _site/</span>
