@@ -101,7 +101,7 @@ window.onload = wrap_img;
        • <span class="read-time" title="Estimated read time">
     
     
-      6 min read
+      8 min read
     
 </span></p>
 
@@ -125,9 +125,13 @@ window.onload = wrap_img;
 <li class="toc-entry toc-h1"><a href="#how-i-implemented-speed-run-eth-challenge-1">How I Implemented Speed Run ETH Challenge 1</a></li>
 <li class="toc-entry toc-h1"><a href="#what-im-building">What I’m Building</a></li>
 <li class="toc-entry toc-h1"><a href="#the-code">The Code</a></li>
-<li class="toc-entry toc-h1"><a href="#checkpoint-2-staking">Checkpoint 2: Staking</a></li>
-<li class="toc-entry toc-h1"><a href="#checkpoint-3">Checkpoint 3</a></li>
-<li class="toc-entry toc-h1"><a href="#checkpoint-4">Checkpoint 4</a></li>
+<li class="toc-entry toc-h1"><a href="#checkpoint-2--staking-">Checkpoint 2: 🥩 Staking 💵</a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#extra-credit---modifiers">Extra Credit - modifiers</a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h1"><a href="#checkpoint-3--state-machine--timing-">Checkpoint 3: 🔬 State Machine / Timing ⏱</a></li>
+<li class="toc-entry toc-h1"><a href="#checkpoint-4--receive-function--ux-">Checkpoint 4: 💵 Receive Function / UX 🙎</a></li>
 <li class="toc-entry toc-h1"><a href="#so-what-did-we-do">So What Did We Do?</a></li>
 </ul><h1 id="draft">
 <a class="anchor" href="#draft" aria-hidden="true"><span class="octicon octicon-link"></span></a>DRAFT</h1>
@@ -149,247 +153,267 @@ window.onload = wrap_img;
 <h1 id="the-code">
 <a class="anchor" href="#the-code" aria-hidden="true"><span class="octicon octicon-link"></span></a>The Code</h1>
 
-<p>Deployed contract address:</p>
+<p>Deployed contract address: https://rinkeby.etherscan.io/address/0x137cbEAA01865C1Ca907e4692bc1307c72e3b9d4
+Deployed UI: https://macabre-cakes.surge.sh/</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// SPDX-License-Identifier: MIT
-pragma solidity 0.8.4;
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SPDX-License-Identifier: MIT
+</span><span class="k">pragma</span> <span class="n">solidity</span> <span class="mf">0.8</span><span class="p">.</span><span class="mi">4</span><span class="p">;</span>
 
-import "hardhat/console.sol";
-import "./ExampleExternalContract.sol";
+<span class="k">import</span> <span class="s">"hardhat/console.sol"</span><span class="p">;</span>
+<span class="k">import</span> <span class="s">"./ExampleExternalContract.sol"</span><span class="p">;</span>
 
-contract Staker {
-  // VARIABLES
-  /// External contract that will hold staked funds if threshold reached
-  ExampleExternalContract public exampleExternalContract;
+<span class="k">contract</span> <span class="n">Staker</span> <span class="p">{</span>
+  <span class="c1">// VARIABLES
+</span>  <span class="c1">/// External contract that will hold staked funds if threshold reached
+</span>  <span class="n">ExampleExternalContract</span> <span class="k">public</span> <span class="n">exampleExternalContract</span><span class="p">;</span>
 
-  /// Balances of user's staked funds
-  mapping (address =&gt; uint256) public balances;
+  <span class="c1">/// Balances of user's staked funds
+</span>  <span class="k">mapping</span> <span class="p">(</span><span class="kt">address</span> <span class="o">=&gt;</span> <span class="kt">uint256</span><span class="p">)</span> <span class="k">public</span> <span class="n">balances</span><span class="p">;</span>
 
-  /// Staking threshold
-  uint256 public constant threshold = 1 ether;
+  <span class="c1">/// Staking threshold
+</span>  <span class="kt">uint256</span> <span class="k">public</span> <span class="k">constant</span> <span class="n">threshold</span> <span class="o">=</span> <span class="mi">1</span> <span class="kc">ether</span><span class="p">;</span>
 
-  /// Staking deadline
-  uint256 public deadline = block.timestamp + 72 hours;
+  <span class="c1">/// Staking deadline
+</span>  <span class="kt">uint256</span> <span class="k">public</span> <span class="n">deadline</span> <span class="o">=</span> <span class="n">block</span><span class="p">.</span><span class="n">timestamp</span> <span class="o">+</span> <span class="mi">72</span> <span class="kc">hours</span><span class="p">;</span>
 
-  /// Boolean set if threshold is not reached by the deadline
-  bool public openForWithdraw;
+  <span class="c1">/// Boolean set if threshold is not reached by the deadline
+</span>  <span class="kt">bool</span> <span class="k">public</span> <span class="n">openForWithdraw</span><span class="p">;</span>
 
-  // EVENTS
-  /// Emit when stake() is called
-  event Stake(address sender, uint256 value);
+  <span class="c1">// EVENTS
+</span>  <span class="c1">/// Emit when stake() is called
+</span>  <span class="k">event</span> <span class="n">Stake</span><span class="p">(</span><span class="kt">address</span> <span class="n">sender</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">value</span><span class="p">);</span>
 
-  // MODIFIERS
-  /// Modifier that checks whether the required deadline has passed
-  modifier deadlinePassed(bool requireDeadlinePassed) {
-    uint256 timeRemaining = timeLeft();
-    if (requireDeadlinePassed) {
-      require(timeRemaining &lt;= 0, "Deadline has not been passed yet");
-    } else {
-      require(timeRemaining &gt; 0, "Deadline is already passed");
-    }
-    _;
-  }
+  <span class="c1">// MODIFIERS
+</span>  <span class="c1">/// Modifier that checks whether the required deadline has passed
+</span>  <span class="k">modifier</span> <span class="n">deadlinePassed</span><span class="p">(</span><span class="kt">bool</span> <span class="n">requireDeadlinePassed</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">uint256</span> <span class="n">timeRemaining</span> <span class="o">=</span> <span class="n">timeLeft</span><span class="p">();</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">requireDeadlinePassed</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nb">require</span><span class="p">(</span><span class="n">timeRemaining</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="s">"Deadline has not been passed yet"</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="nb">require</span><span class="p">(</span><span class="n">timeRemaining</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s">"Deadline is already passed"</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">_</span><span class="p">;</span>
+  <span class="p">}</span>
 
-  /// Modifier that checks whether the external contract is completed
-  modifier stakingNotCompleted() {
-    bool completed = exampleExternalContract.completed();
-    require(!completed, "Staking period has completed");
-    _;
-  }
+  <span class="c1">/// Modifier that checks whether the external contract is completed
+</span>  <span class="k">modifier</span> <span class="n">stakingNotCompleted</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kt">bool</span> <span class="n">completed</span> <span class="o">=</span> <span class="n">exampleExternalContract</span><span class="p">.</span><span class="n">completed</span><span class="p">();</span>
+    <span class="nb">require</span><span class="p">(</span><span class="o">!</span><span class="n">completed</span><span class="p">,</span> <span class="s">"Staking period has completed"</span><span class="p">);</span>
+    <span class="n">_</span><span class="p">;</span>
+  <span class="p">}</span>
 
-  constructor(address exampleExternalContractAddress) public {
-      exampleExternalContract = ExampleExternalContract(exampleExternalContractAddress);
-  }
+  <span class="k">constructor</span><span class="p">(</span><span class="kt">address</span> <span class="n">exampleExternalContractAddress</span><span class="p">)</span> <span class="k">public</span> <span class="p">{</span>
+      <span class="n">exampleExternalContract</span> <span class="o">=</span> <span class="n">ExampleExternalContract</span><span class="p">(</span><span class="n">exampleExternalContractAddress</span><span class="p">);</span>
+  <span class="p">}</span>
 
-  // Collect funds in a payable `stake()` function and track individual `balances` with a mapping:
-  //  ( make sure to add a `Stake(address,uint256)` event and emit it for the frontend &lt;List/&gt; display )
-  function stake() public payable deadlinePassed(false) stakingNotCompleted {
-    // update the sender's balance
-    balances[msg.sender] += msg.value;
+  <span class="c1">// Collect funds in a payable `stake()` function and track individual `balances` with a mapping:
+</span>  <span class="c1">//  ( make sure to add a `Stake(address,uint256)` event and emit it for the frontend &lt;List/&gt; display )
+</span>  <span class="k">function</span> <span class="n">stake</span><span class="p">()</span> <span class="k">public</span> <span class="k">payable</span> <span class="n">deadlinePassed</span><span class="p">(</span><span class="nb">false</span><span class="p">)</span> <span class="n">stakingNotCompleted</span> <span class="p">{</span>
+    <span class="c1">// update the sender's balance
+</span>    <span class="n">balances</span><span class="p">[</span><span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">]</span> <span class="o">+=</span> <span class="n">msg</span><span class="p">.</span><span class="n">value</span><span class="p">;</span>
 
-    // emit Stake event to notify the UI
-    emit Stake(msg.sender, msg.value);
-  }
-
-
-  // After some `deadline` allow anyone to call an `execute()` function
-  //  It should either call `exampleExternalContract.complete{value: address(this).balance}()` to send all the value
-  function execute() public stakingNotCompleted {
-    uint256 contractBalance = address(this).balance;
-    if (contractBalance &gt;= threshold) {
-      // if the `threshold` is met, send the balance to the externalContract
-      exampleExternalContract.complete{value: contractBalance}();
-    } else {
-      // if the `threshold` was not met, allow everyone to call a `withdraw()` function
-      openForWithdraw = true;
-    }
-  }
+    <span class="c1">// emit Stake event to notify the UI
+</span>    <span class="k">emit</span> <span class="n">Stake</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">,</span> <span class="n">msg</span><span class="p">.</span><span class="n">value</span><span class="p">);</span>
+  <span class="p">}</span>
 
 
-
-  // Add a `withdraw(address payable)` function lets users withdraw their balance
-  function withdraw(address payable _to) public deadlinePassed(true) stakingNotCompleted {
-      // check the amount staked did not reach the threshold by the deadline
-      require(openForWithdraw, "Not open for withdraw");
-
-      // get the sender balance
-      uint256 userBalance = balances[msg.sender];
-
-      // check if the sender has a balance to withdraw
-      require(userBalance &gt; 0, "userBalance is 0");
-
-      // reset the sender's balance
-      balances[msg.sender] = 0;
-
-      // transfer sender's balance to the `_to` address
-      (bool sent, ) = _to.call{value: userBalance}("");
-
-      // check transfer was successful
-      require(sent, "Failed to send to address");
-  }
-
-  /// Add a `timeLeft()` view function that returns the time left before the deadline for the frontend
-  function timeLeft() public view returns (uint256) {
-      if (block.timestamp &gt;= deadline) {
-          return 0;
-      } else {
-          return deadline - block.timestamp;
-      }
-  }
+  <span class="c1">// After some `deadline` allow anyone to call an `execute()` function
+</span>  <span class="c1">//  It should either call `exampleExternalContract.complete{value: address(this).balance}()` to send all the value
+</span>  <span class="k">function</span> <span class="n">execute</span><span class="p">()</span> <span class="k">public</span> <span class="n">stakingNotCompleted</span> <span class="p">{</span>
+    <span class="kt">uint256</span> <span class="n">contractBalance</span> <span class="o">=</span> <span class="kt">address</span><span class="p">(</span><span class="nb">this</span><span class="p">).</span><span class="nb">balance</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">contractBalance</span> <span class="o">&gt;=</span> <span class="n">threshold</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// if the `threshold` is met, send the balance to the externalContract
+</span>      <span class="n">exampleExternalContract</span><span class="p">.</span><span class="n">complete</span><span class="p">{</span><span class="n">value</span><span class="o">:</span> <span class="n">contractBalance</span><span class="p">}();</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="c1">// if the `threshold` was not met, allow everyone to call a `withdraw()` function
+</span>      <span class="n">openForWithdraw</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
 
 
-  // Add the `receive()` special function that receives eth and calls stake()
-  receive() external payable {
-      stake();
-  }
-}
+
+  <span class="c1">// Add a `withdraw(address payable)` function lets users withdraw their balance
+</span>  <span class="k">function</span> <span class="n">withdraw</span><span class="p">(</span><span class="kt">address</span> <span class="k">payable</span> <span class="n">_to</span><span class="p">)</span> <span class="k">public</span> <span class="n">deadlinePassed</span><span class="p">(</span><span class="nb">true</span><span class="p">)</span> <span class="n">stakingNotCompleted</span> <span class="p">{</span>
+      <span class="c1">// check the amount staked did not reach the threshold by the deadline
+</span>      <span class="nb">require</span><span class="p">(</span><span class="n">openForWithdraw</span><span class="p">,</span> <span class="s">"Not open for withdraw"</span><span class="p">);</span>
+
+      <span class="c1">// get the sender balance
+</span>      <span class="kt">uint256</span> <span class="n">userBalance</span> <span class="o">=</span> <span class="n">balances</span><span class="p">[</span><span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">];</span>
+
+      <span class="c1">// check if the sender has a balance to withdraw
+</span>      <span class="nb">require</span><span class="p">(</span><span class="n">userBalance</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s">"userBalance is 0"</span><span class="p">);</span>
+
+      <span class="c1">// reset the sender's balance
+</span>      <span class="n">balances</span><span class="p">[</span><span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+      <span class="c1">// transfer sender's balance to the `_to` address
+</span>      <span class="p">(</span><span class="kt">bool</span> <span class="n">sent</span><span class="p">,</span> <span class="p">)</span> <span class="o">=</span> <span class="n">_to</span><span class="p">.</span><span class="nb">call</span><span class="p">{</span><span class="n">value</span><span class="o">:</span> <span class="n">userBalance</span><span class="p">}(</span><span class="s">""</span><span class="p">);</span>
+
+      <span class="c1">// check transfer was successful
+</span>      <span class="nb">require</span><span class="p">(</span><span class="n">sent</span><span class="p">,</span> <span class="s">"Failed to send to address"</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="c1">/// Add a `timeLeft()` view function that returns the time left before the deadline for the frontend
+</span>  <span class="k">function</span> <span class="n">timeLeft</span><span class="p">()</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">block</span><span class="p">.</span><span class="n">timestamp</span> <span class="o">&gt;=</span> <span class="n">deadline</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+          <span class="k">return</span> <span class="n">deadline</span> <span class="o">-</span> <span class="n">block</span><span class="p">.</span><span class="n">timestamp</span><span class="p">;</span>
+      <span class="p">}</span>
+  <span class="p">}</span>
+
+
+  <span class="c1">// Add the `receive()` special function that receives eth and calls stake()
+</span>  <span class="k">receive</span><span class="p">()</span> <span class="k">external</span> <span class="k">payable</span> <span class="p">{</span>
+      <span class="n">stake</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
 </code></pre></div></div>
 
-<h1 id="checkpoint-2-staking">
-<a class="anchor" href="#checkpoint-2-staking" aria-hidden="true"><span class="octicon octicon-link"></span></a>Checkpoint 2: Staking</h1>
+<h1 id="checkpoint-2--staking-">
+<a class="anchor" href="#checkpoint-2--staking-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Checkpoint 2: 🥩 Staking 💵</h1>
 
 <p>The first challenge after getting my environment set up is to implement staking.</p>
 
-<p>I add the 2 variables needed and implement the stake function below</p>
+<p>I add the 2 variables needed</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mapping ( address =&gt; uint256 ) public balances;
-uint256 public constant threshold = 1 ether;
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">mapping</span> <span class="p">(</span> <span class="kt">address</span> <span class="o">=&gt;</span> <span class="kt">uint256</span> <span class="p">)</span> <span class="k">public</span> <span class="n">balances</span><span class="p">;</span>
+<span class="kt">uint256</span> <span class="k">public</span> <span class="k">constant</span> <span class="n">threshold</span> <span class="o">=</span> <span class="mi">1</span> <span class="kc">ether</span><span class="p">;</span>
 </code></pre></div></div>
 
-<p>Then i implement the staking function</p>
+<p>Then I implement the staking function</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// Emit when stake() is called
-event Stake(address sender, uint256 value);
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">/// Emit when stake() is called
+</span><span class="k">event</span> <span class="n">Stake</span><span class="p">(</span><span class="kt">address</span> <span class="n">sender</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">value</span><span class="p">);</span>
 
-// Collect funds in a payable `stake()` function and track individual `balances` with a mapping:
+<span class="c1">/// Modifier that checks whether the external contract is completed
+</span><span class="k">modifier</span> <span class="n">stakingNotCompleted</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kt">bool</span> <span class="n">completed</span> <span class="o">=</span> <span class="n">exampleExternalContract</span><span class="p">.</span><span class="n">completed</span><span class="p">();</span>
+  <span class="nb">require</span><span class="p">(</span><span class="o">!</span><span class="n">completed</span><span class="p">,</span> <span class="s">"Staking period has completed"</span><span class="p">);</span>
+  <span class="n">_</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">/// Modifier that checks whether the required deadline has passed
+</span><span class="k">modifier</span> <span class="n">deadlinePassed</span><span class="p">(</span><span class="kt">bool</span> <span class="n">requireDeadlinePassed</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kt">uint256</span> <span class="n">timeRemaining</span> <span class="o">=</span> <span class="n">timeLeft</span><span class="p">();</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">requireDeadlinePassed</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nb">require</span><span class="p">(</span><span class="n">timeRemaining</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="s">"Deadline has not been passed yet"</span><span class="p">);</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nb">require</span><span class="p">(</span><span class="n">timeRemaining</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s">"Deadline is already passed"</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="n">_</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// Collect funds in a payable `stake()` function and track individual `balances` with a mapping:
 //  ( make sure to add a `Stake(address,uint256)` event and emit it for the frontend &lt;List/&gt; display )
-function stake() public payable {
-   balances[msg.sender] += msg.value;
+</span><span class="k">function</span> <span class="n">stake</span><span class="p">()</span> <span class="k">public</span> <span class="k">payable</span> <span class="n">deadlinePassed</span><span class="p">(</span><span class="nb">false</span><span class="p">)</span> <span class="n">stakingNotCompleted</span> <span class="p">{</span>
+  <span class="c1">// update the sender's balance
+</span>  <span class="n">balances</span><span class="p">[</span><span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">]</span> <span class="o">+=</span> <span class="n">msg</span><span class="p">.</span><span class="n">value</span><span class="p">;</span>
 
-   emit Stake(msg.sender, msg.value);
-}
+  <span class="c1">// emit Stake event to notify the UI
+</span>  <span class="k">emit</span> <span class="n">Stake</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">,</span> <span class="n">msg</span><span class="p">.</span><span class="n">value</span><span class="p">);</span>
+<span class="p">}</span>
 </code></pre></div></div>
 
-<p>Since he stake function is marked as <code class="language-plaintext highlighter-rouge">payable</code>, the function is able to recieve ether and has access to the sender’s address -<code class="language-plaintext highlighter-rouge">msg.sender</code>-  and the amount of ether sent - <code class="language-plaintext highlighter-rouge">msg.value</code>.</p>
+<p>Since the stake function is marked as <code class="language-plaintext highlighter-rouge">payable</code>, the function is able to recieve ether and has access to the sender’s address through <code class="language-plaintext highlighter-rouge">msg.sender</code> and the amount of ether sent through <code class="language-plaintext highlighter-rouge">msg.value</code>.</p>
 
-<p>Using these variables, we can update the contract’s <code class="language-plaintext highlighter-rouge">balances</code> mapping with the total amount of ether that address has sent.</p>
+<p>Using these variables, I can update the contract’s <code class="language-plaintext highlighter-rouge">balances</code> mapping with the total amount of ether that address has sent.</p>
 
 <p>You’ll notice I didn’t have to initialize <code class="language-plaintext highlighter-rouge">balances[msg.sender]</code> to 0. Solidity will automatically initialize variables to 0 values.</p>
 
-<p>After updating, the function emit’s a Stake event. This is how our UI will know something has happened on the blockchain.</p>
+<p>After updating, the function emit’s a <code class="language-plaintext highlighter-rouge">Stake</code> event. This is how I alert the UI that something has happened on the blockchain.</p>
 
-<h1 id="checkpoint-3">
-<a class="anchor" href="#checkpoint-3" aria-hidden="true"><span class="octicon octicon-link"></span></a>Checkpoint 3</h1>
+<h2 id="extra-credit---modifiers">
+<a class="anchor" href="#extra-credit---modifiers" aria-hidden="true"><span class="octicon octicon-link"></span></a>Extra Credit - modifiers</h2>
 
-<p>The next checkout is the meat of the contract. I need to keeps track of what state the contract is in. Is it open for staking? Does the contract balance exceed the threshold? Have we passed the deadline?</p>
+<p>I’ve included 2 modifiers here that are useful for later challenges. I separated these specific validations because they’re needed in multiple functions as we’ll see later.</p>
 
-<p>Let’s talk about each function separately.</p>
+<p>The first is <code class="language-plaintext highlighter-rouge">deadlinePassed</code>. If I pass <code class="language-plaintext highlighter-rouge">false</code> to this modifer, it means the function will only execute if the deadline has NOT passed. We’ll see a different usage of this modifier in the <code class="language-plaintext highlighter-rouge">withdraw</code> function.</p>
 
-<p>First we have execute</p>
+<p>There is also the <code class="language-plaintext highlighter-rouge">stakingNotCompleted</code> modifier. If the balance has already been sent to the external contract, staking is completed and <code class="language-plaintext highlighter-rouge">execute</code> will fail and revert.</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Staking deadline
-uint256 public deadline = block.timestamp + 30 seconds;
+<h1 id="checkpoint-3--state-machine--timing-">
+<a class="anchor" href="#checkpoint-3--state-machine--timing-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Checkpoint 3: 🔬 State Machine / Timing ⏱</h1>
 
-/// Boolean set if threshold is not reached by the deadline
-bool public openForWithdraw;
+<p>The next checkout is the core logic of the contract. I need to keeps track of what state the contract is in. Is it open for staking? Does the contract balance exceed the threshold? Have we passed the deadline?</p>
 
-// After some `deadline` allow anyone to call an `execute()` function
+<p>I’ll walk through each function separately.</p>
+
+<p>First, there’s <code class="language-plaintext highlighter-rouge">execute</code></p>
+
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Staking deadline
+</span><span class="kt">uint256</span> <span class="k">public</span> <span class="n">deadline</span> <span class="o">=</span> <span class="n">block</span><span class="p">.</span><span class="n">timestamp</span> <span class="o">+</span> <span class="mi">30</span> <span class="kc">seconds</span><span class="p">;</span>
+
+<span class="c1">/// Boolean set if threshold is not reached by the deadline
+</span><span class="kt">bool</span> <span class="k">public</span> <span class="n">openForWithdraw</span><span class="p">;</span>
+
+<span class="c1">// After some `deadline` allow anyone to call an `execute()` function
 // It should either call `exampleExternalContract.complete{value: address(this).balance}()` to send all the value
-function execute() public stakingNotCompleted {
-  uint256 contractBalance = address(this).balance;
-  if (contractBalance &gt;= threshold) {
-    // if the `threshold` is met, send the balance to the externalContract
-    exampleExternalContract.complete{value: contractBalance}();
-  } else {
-    // if the `threshold` was not met, allow everyone to call a `withdraw()` function
-    openForWithdraw = true;
-  }
-}
+</span><span class="k">function</span> <span class="n">execute</span><span class="p">()</span> <span class="k">public</span> <span class="n">stakingNotCompleted</span> <span class="p">{</span>
+  <span class="kt">uint256</span> <span class="n">contractBalance</span> <span class="o">=</span> <span class="kt">address</span><span class="p">(</span><span class="nb">this</span><span class="p">).</span><span class="nb">balance</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">contractBalance</span> <span class="o">&gt;=</span> <span class="n">threshold</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// if the `threshold` is met, send the balance to the externalContract
+</span>    <span class="n">exampleExternalContract</span><span class="p">.</span><span class="n">complete</span><span class="p">{</span><span class="n">value</span><span class="o">:</span> <span class="n">contractBalance</span><span class="p">}();</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="c1">// if the `threshold` was not met, allow everyone to call a `withdraw()` function
+</span>    <span class="n">openForWithdraw</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
 
 </code></pre></div></div>
 
-<p>Next we have withdraw</p>
+<p>This first checks if the deadline has passed or not through the <code class="language-plaintext highlighter-rouge">stakingNotCompleted</code> modifier.</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Add a `withdraw(address payable)` function lets users withdraw their balance
-function withdraw(address payable _to) public deadlinePassed(true) stakingNotCompleted {
-    // check the amount staked did not reach the threshold by the deadline
-    require(openForWithdraw, "Not open for withdraw");
+<p>If the staking is not completed, we next check the contract balance and see if it’s exceeded the threshold. If so, we complete the staking period by sending the balance to the external contract.</p>
 
-    // get the sender balance
-    uint256 userBalance = balances[msg.sender];
+<p>If not, I set the <code class="language-plaintext highlighter-rouge">openForWithdraw</code> boolean to <code class="language-plaintext highlighter-rouge">true</code> and allow everyone to withdraw their money back.</p>
 
-    // check if the sender has a balance to withdraw
-    require(userBalance &gt; 0, "userBalance is 0");
+<p>Next, let’s look at the <code class="language-plaintext highlighter-rouge">withdraw</code> function</p>
 
-    // reset the sender's balance
-    balances[msg.sender] = 0;
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Add a `withdraw(address payable)` function lets users withdraw their balance
+</span><span class="k">function</span> <span class="n">withdraw</span><span class="p">(</span><span class="kt">address</span> <span class="k">payable</span> <span class="n">_to</span><span class="p">)</span> <span class="k">public</span> <span class="n">deadlinePassed</span><span class="p">(</span><span class="nb">true</span><span class="p">)</span> <span class="n">stakingNotCompleted</span> <span class="p">{</span>
+    <span class="c1">// check the amount staked did not reach the threshold by the deadline
+</span>    <span class="nb">require</span><span class="p">(</span><span class="n">openForWithdraw</span><span class="p">,</span> <span class="s">"Not open for withdraw"</span><span class="p">);</span>
 
-    // transfer sender's balance to the `_to` address
-    (bool sent, ) = _to.call{value: userBalance}("");
+    <span class="c1">// get the sender balance
+</span>    <span class="kt">uint256</span> <span class="n">userBalance</span> <span class="o">=</span> <span class="n">balances</span><span class="p">[</span><span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">];</span>
 
-    // check transfer was successful
-    require(sent, "Failed to send to address");
-}
+    <span class="c1">// check if the sender has a balance to withdraw
+</span>    <span class="nb">require</span><span class="p">(</span><span class="n">userBalance</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s">"userBalance is 0"</span><span class="p">);</span>
+
+    <span class="c1">// reset the sender's balance
+</span>    <span class="n">balances</span><span class="p">[</span><span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+    <span class="c1">// transfer sender's balance to the `_to` address
+</span>    <span class="p">(</span><span class="kt">bool</span> <span class="n">sent</span><span class="p">,</span> <span class="p">)</span> <span class="o">=</span> <span class="n">_to</span><span class="p">.</span><span class="nb">call</span><span class="p">{</span><span class="n">value</span><span class="o">:</span> <span class="n">userBalance</span><span class="p">}(</span><span class="s">""</span><span class="p">);</span>
+
+    <span class="c1">// check transfer was successful
+</span>    <span class="nb">require</span><span class="p">(</span><span class="n">sent</span><span class="p">,</span> <span class="s">"Failed to send to address"</span><span class="p">);</span>
+<span class="p">}</span>
 </code></pre></div></div>
 
-<p>Finally the helper function timeLeft</p>
+<p>Once the modifiers are passed, I check that the contract is open for withdraw and that the user has ether to send back. Before actually sending the ether, notice that I set the sender’s balance to 0 in the contract’s <code class="language-plaintext highlighter-rouge">balances</code> mapping.</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// Add a `timeLeft()` view function that returns the time left before the deadline for the frontend
-function timeLeft() public view returns (uint256) {
-    if (block.timestamp &gt;= deadline) {
-        return 0;
-    } else {
-        return deadline - block.timestamp;
-    }
-}
+<p>I always want to make all state changes before calling other contracts or sending ether. This prevents something known as a <a href="https://solidity-by-example.org/hacks/re-entrancy/">Re-Entrancy attack</a>. If we were to send the balance before setting the sender’s balance to 0, it’s possible for the sender to call <code class="language-plaintext highlighter-rouge">withdraw</code> multiple times before the <code class="language-plaintext highlighter-rouge">_to.call</code> function completes. The contract will think the sender still has an ether balance and will keep sending extra ether until the first call completes.</p>
+
+<p>Finally, after all checks have passed, I send the ether and check that the transfer was successful.</p>
+
+<p>The last function to mention is the helper function <code class="language-plaintext highlighter-rouge">timeLeft</code></p>
+
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">/// Add a `timeLeft()` view function that returns the time left before the deadline for the frontend
+</span><span class="k">function</span> <span class="n">timeLeft</span><span class="p">()</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">block</span><span class="p">.</span><span class="n">timestamp</span> <span class="o">&gt;=</span> <span class="n">deadline</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">deadline</span> <span class="o">-</span> <span class="n">block</span><span class="p">.</span><span class="n">timestamp</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 </code></pre></div></div>
 
-<ul>
-  <li>
-    <p>requires</p>
-  </li>
-  <li>
-    <p>timestamp</p>
-  </li>
-  <li>
-    <p>address(this).balance</p>
-  </li>
-  <li>
-    <p>calling other contracts</p>
-  </li>
-  <li>
-    <p>sending ether to an address</p>
-  </li>
-  <li>
-    <p>view</p>
-  </li>
-  <li>
-    <p>returns</p>
-  </li>
-</ul>
+<p>This is used in <code class="language-plaintext highlighter-rouge">deadlinePassed</code> to see how much time is left in the staking period.</p>
 
-<h1 id="checkpoint-4">
-<a class="anchor" href="#checkpoint-4" aria-hidden="true"><span class="octicon octicon-link"></span></a>Checkpoint 4</h1>
+<h1 id="checkpoint-4--receive-function--ux-">
+<a class="anchor" href="#checkpoint-4--receive-function--ux-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Checkpoint 4: 💵 Receive Function / UX 🙎</h1>
 
 <p>For this checkpoint, we implement a <code class="language-plaintext highlighter-rouge">receive</code> function to automatically stake eth which has been sent to the contract address.</p>
 
@@ -399,33 +423,12 @@ receive() external payable {
 }
 </code></pre></div></div>
 
-<p>We also create some modifiers to share logic across functions</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  /// Modifier that checks whether the required deadline has passed
-  modifier deadlinePassed(bool requireDeadlinePassed) {
-    uint256 timeRemaining = timeLeft();
-    if (requireDeadlinePassed) {
-      require(timeRemaining &lt;= 0, "Deadline has not been passed yet");
-    } else {
-      require(timeRemaining &gt; 0, "Deadline is already passed");
-    }
-    _;
-  }
-
-  /// Modifier that checks whether the external contract is completed
-  modifier stakingNotCompleted() {
-    bool completed = exampleExternalContract.completed();
-    require(!completed, "Staking period has completed");
-    _;
-  }
-</code></pre></div></div>
-
 <h1 id="so-what-did-we-do">
 <a class="anchor" href="#so-what-did-we-do" aria-hidden="true"><span class="octicon octicon-link"></span></a>So What Did We Do?</h1>
 
-<p>I updated the code to point at the <code class="language-plaintext highlighter-rouge">Rinkeby</code> ethereum test net and deployed the frontend to surge.</p>
+<p>I updated the code to point at the <code class="language-plaintext highlighter-rouge">Rinkeby</code> ethereum test net and deployed the frontend to https://macabre-cakes.surge.sh/</p>
 
-<p>You can see the deployed UI here althrough the staking period is over by now.</p>
+<p>You can try it out for yourself although the staking period is over by now.</p>
 
 <p>Now on to Challenge 2.</p>
 
