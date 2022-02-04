@@ -24,6 +24,7 @@ Here's the description from the challenge page: https://speedrunethereum.com/cha
 # The Code
 
 Deployed contract address: https://rinkeby.etherscan.io/address/0x137cbEAA01865C1Ca907e4692bc1307c72e3b9d4
+
 Deployed UI: https://macabre-cakes.surge.sh/
 
 ```solidity
