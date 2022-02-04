@@ -23,9 +23,10 @@ Here's the description from the challenge page: https://speedrunethereum.com/cha
 
 # The Code
 
-Deployed contract address: 
+Deployed contract address: https://rinkeby.etherscan.io/address/0x137cbEAA01865C1Ca907e4692bc1307c72e3b9d4
+Deployed UI: https://macabre-cakes.surge.sh/
 
-```
+```solidity
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.4;
 
@@ -140,53 +141,77 @@ contract Staker {
 }
 ```
 
-# Checkpoint 2: Staking
+# Checkpoint 2: 🥩 Staking 💵
 
 The first challenge after getting my environment set up is to implement staking.
 
-I add the 2 variables needed and implement the stake function below
+I add the 2 variables needed
 
-```
+```solidity
 mapping ( address => uint256 ) public balances;
 uint256 public constant threshold = 1 ether;
 ```
 
-Then i implement the staking function
+Then I implement the staking function
 
-```
+```solidity
 /// Emit when stake() is called
 event Stake(address sender, uint256 value);
 
+/// Modifier that checks whether the external contract is completed
+modifier stakingNotCompleted() {
+  bool completed = exampleExternalContract.completed();
+  require(!completed, "Staking period has completed");
+  _;
+}
+
+/// Modifier that checks whether the required deadline has passed
+modifier deadlinePassed(bool requireDeadlinePassed) {
+  uint256 timeRemaining = timeLeft();
+  if (requireDeadlinePassed) {
+    require(timeRemaining <= 0, "Deadline has not been passed yet");
+  } else {
+    require(timeRemaining > 0, "Deadline is already passed");
+  }
+  _;
+}
+
 // Collect funds in a payable `stake()` function and track individual `balances` with a mapping:
 //  ( make sure to add a `Stake(address,uint256)` event and emit it for the frontend <List/> display )
-function stake() public payable {
-   balances[msg.sender] += msg.value;
+function stake() public payable deadlinePassed(false) stakingNotCompleted {
+  // update the sender's balance
+  balances[msg.sender] += msg.value;
 
-   emit Stake(msg.sender, msg.value);
+  // emit Stake event to notify the UI
+  emit Stake(msg.sender, msg.value);
 }
 ```
 
-Since he stake function is marked as `payable`, the function is able to recieve ether and has access to the sender's address -`msg.sender`-  and the amount of ether sent - `msg.value`.
+Since the stake function is marked as `payable`, the function is able to recieve ether and has access to the sender's address through `msg.sender` and the amount of ether sent through `msg.value`.
 
-Using these variables, we can update the contract's `balances` mapping with the total amount of ether that address has sent.
+Using these variables, I can update the contract's `balances` mapping with the total amount of ether that address has sent.
 
 You'll notice I didn't have to initialize `balances[msg.sender]` to 0. Solidity will automatically initialize variables to 0 values.
 
-After updating, the function emit's a Stake event. This is how our UI will know something has happened on the blockchain.
+After updating, the function emit's a `Stake` event. This is how I alert the UI that something has happened on the blockchain.
 
-# Checkpoint 3
+## Extra Credit - modifiers
 
-The next checkout is the meat of the contract. I need to keeps track of what state the contract is in. Is it open for staking? Does the contract balance exceed the threshold? Have we passed the deadline?
+I've included 2 modifiers here that are useful for later challenges. I separated these specific validations because they're needed in multiple functions as we'll see later. 
 
+The first is `deadlinePassed`. If I pass `false` to this modifer, it means the function will only execute if the deadline has NOT passed. We'll see a different usage of this modifier in the `withdraw` function.
 
+There is also the `stakingNotCompleted` modifier. If the balance has already been sent to the external contract, staking is completed and `execute` will fail and revert.
 
-Let's talk about each function separately.
+# Checkpoint 3: 🔬 State Machine / Timing ⏱
 
+The next checkout is the core logic of the contract. I need to keeps track of what state the contract is in. Is it open for staking? Does the contract balance exceed the threshold? Have we passed the deadline?
 
+I'll walk through each function separately.
 
-First we have execute
+First, there's `execute`
 
-```
+```solidity
 // Staking deadline
 uint256 public deadline = block.timestamp + 30 seconds;
 
@@ -208,11 +233,15 @@ function execute() public stakingNotCompleted {
 
 ```
 
+This first checks if the deadline has passed or not through the `stakingNotCompleted` modifier.
 
+If the staking is not completed, we next check the contract balance and see if it's exceeded the threshold. If so, we complete the staking period by sending the balance to the external contract.
 
-Next we have withdraw
+If not, I set the `openForWithdraw` boolean to `true` and allow everyone to withdraw their money back.
 
-```
+Next, let's look at the `withdraw` function
+
+```solidity
 // Add a `withdraw(address payable)` function lets users withdraw their balance
 function withdraw(address payable _to) public deadlinePassed(true) stakingNotCompleted {
     // check the amount staked did not reach the threshold by the deadline
@@ -235,11 +264,15 @@ function withdraw(address payable _to) public deadlinePassed(true) stakingNotCom
 }
 ```
 
+Once the modifiers are passed, I check that the contract is open for withdraw and that the user has ether to send back. Before actually sending the ether, notice that I set the sender's balance to 0 in the contract's `balances` mapping. 
 
+I always want to make all state changes before calling other contracts or sending ether. This prevents something known as a [Re-Entrancy attack](https://solidity-by-example.org/hacks/re-entrancy/). If we were to send the balance before setting the sender's balance to 0, it's possible for the sender to call `withdraw` multiple times before the `_to.call` function completes. The contract will think the sender still has an ether balance and will keep sending extra ether until the first call completes.
 
-Finally the helper function timeLeft
+Finally, after all checks have passed, I send the ether and check that the transfer was successful.
 
-```
+The last function to mention is the helper function `timeLeft`
+
+```solidity
 /// Add a `timeLeft()` view function that returns the time left before the deadline for the frontend
 function timeLeft() public view returns (uint256) {
     if (block.timestamp >= deadline) {
@@ -250,25 +283,9 @@ function timeLeft() public view returns (uint256) {
 }
 ```
 
+This is used in `deadlinePassed` to see how much time is left in the staking period.
 
-
-
-
-* requires
-
-* timestamp
-
-* address(this).balance
-
-* calling other contracts
-
-* sending ether to an address
-
-* view
-
-* returns
-
-# Checkpoint 4
+# Checkpoint 4: 💵 Receive Function / UX 🙎
 
 For this checkpoint, we implement a `receive` function to automatically stake eth which has been sent to the contract address.
 
@@ -279,37 +296,11 @@ receive() external payable {
 }
 ```
 
-
-
-We also create some modifiers to share logic across functions
-
-```
-  /// Modifier that checks whether the required deadline has passed
-  modifier deadlinePassed(bool requireDeadlinePassed) {
-    uint256 timeRemaining = timeLeft();
-    if (requireDeadlinePassed) {
-      require(timeRemaining <= 0, "Deadline has not been passed yet");
-    } else {
-      require(timeRemaining > 0, "Deadline is already passed");
-    }
-    _;
-  }
-
-  /// Modifier that checks whether the external contract is completed
-  modifier stakingNotCompleted() {
-    bool completed = exampleExternalContract.completed();
-    require(!completed, "Staking period has completed");
-    _;
-  }
-```
-
-
-
 # So What Did We Do?
 
-I updated the code to point at the `Rinkeby` ethereum test net and deployed the frontend to surge. 
+I updated the code to point at the `Rinkeby` ethereum test net and deployed the frontend to https://macabre-cakes.surge.sh/
 
-You can see the deployed UI here althrough the staking period is over by now.
+You can try it out for yourself although the staking period is over by now.
 
 Now on to Challenge 2. 
 
