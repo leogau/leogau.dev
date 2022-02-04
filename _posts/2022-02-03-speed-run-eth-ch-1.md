@@ -5,7 +5,7 @@ toc: true
 comments: true
 layout: post
 categories: [solidity, ethereum]
-image: images/fastpages_posts/actions/actions_logo.png
+image: images/staker.png
 author: Leo Gau
 ---
 
@@ -198,7 +198,7 @@ After updating, the function emit's a `Stake` event. This is how I alert the UI 
 
 ## Extra Credit - modifiers
 
-I've included 2 modifiers here that are useful for later challenges. I separated these specific validations because they're needed in multiple functions as we'll see later. 
+I've included 2 modifiers here that are useful for later challenges. I separated these specific validations because they're needed in multiple functions as we'll see later.
 
 The first is `deadlinePassed`. If I pass `false` to this modifer, it means the function will only execute if the deadline has NOT passed. We'll see a different usage of this modifier in the `withdraw` function.
 
@@ -265,7 +265,7 @@ function withdraw(address payable _to) public deadlinePassed(true) stakingNotCom
 }
 ```
 
-Once the modifiers are passed, I check that the contract is open for withdraw and that the user has ether to send back. Before actually sending the ether, notice that I set the sender's balance to 0 in the contract's `balances` mapping. 
+Once the modifiers are passed, I check that the contract is open for withdraw and that the user has ether to send back. Before actually sending the ether, notice that I set the sender's balance to 0 in the contract's `balances` mapping.
 
 I always want to make all state changes before calling other contracts or sending ether. This prevents something known as a [Re-Entrancy attack](https://solidity-by-example.org/hacks/re-entrancy/). If we were to send the balance before setting the sender's balance to 0, it's possible for the sender to call `withdraw` multiple times before the `_to.call` function completes. The contract will think the sender still has an ether balance and will keep sending extra ether until the first call completes.
 
@@ -303,6 +303,6 @@ I updated the code to point at the `Rinkeby` ethereum test net and deployed the 
 
 You can try it out for yourself although the staking period is over by now.
 
-Now on to Challenge 2. 
+Now on to Challenge 2.
 
 See you then!
