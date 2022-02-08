@@ -1,5 +1,5 @@
 ---
-title: "How I Implemented Speed Run ETH Challenge 1: Decentralized Staking App"
+title: "How I Implemented Speed Run Ethereum Challenge 1: Decentralized Staking App"
 description: "Explaining my accepted solution to Speed Run Ethereum Challenge 1"
 toc: true
 comments: true
