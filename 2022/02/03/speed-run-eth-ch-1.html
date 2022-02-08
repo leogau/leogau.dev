@@ -4,13 +4,13 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
-<title>How I Implemented Speed Run ETH Challenge 1 | Leo Gau</title>
+<title>How I Implemented Speed Run ETH Challenge 1: Decentralized Staking App | Leo Gau</title>
 <meta name="generator" content="Jekyll v4.1.1" />
-<meta property="og:title" content="How I Implemented Speed Run ETH Challenge 1" />
+<meta property="og:title" content="How I Implemented Speed Run ETH Challenge 1: Decentralized Staking App" />
 <meta name="author" content="Leo Gau" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="How I Implemented Speed Run ETH Challenge 1" />
-<meta property="og:description" content="How I Implemented Speed Run ETH Challenge 1" />
+<meta name="description" content="Explaining my accepted solution to Speed Run Ethereum Challenge 1" />
+<meta property="og:description" content="Explaining my accepted solution to Speed Run Ethereum Challenge 1" />
 <link rel="canonical" href="https://leogau.dev/2022/02/03/speed-run-eth-ch-1.html" />
 <meta property="og:url" content="https://leogau.dev/2022/02/03/speed-run-eth-ch-1.html" />
 <meta property="og:site_name" content="Leo Gau" />
@@ -18,7 +18,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2022-02-03T00:00:00-06:00" />
 <script type="application/ld+json">
-{"url":"https://leogau.dev/2022/02/03/speed-run-eth-ch-1.html","@type":"BlogPosting","headline":"How I Implemented Speed Run ETH Challenge 1","dateModified":"2022-02-03T00:00:00-06:00","datePublished":"2022-02-03T00:00:00-06:00","image":"https://leogau.dev/images/staker.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://leogau.dev/2022/02/03/speed-run-eth-ch-1.html"},"author":{"@type":"Person","name":"Leo Gau"},"description":"How I Implemented Speed Run ETH Challenge 1","@context":"https://schema.org"}</script>
+{"url":"https://leogau.dev/2022/02/03/speed-run-eth-ch-1.html","@type":"BlogPosting","headline":"How I Implemented Speed Run ETH Challenge 1: Decentralized Staking App","dateModified":"2022-02-03T00:00:00-06:00","datePublished":"2022-02-03T00:00:00-06:00","image":"https://leogau.dev/images/staker.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://leogau.dev/2022/02/03/speed-run-eth-ch-1.html"},"author":{"@type":"Person","name":"Leo Gau"},"description":"Explaining my accepted solution to Speed Run Ethereum Challenge 1","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://leogau.dev/feed.xml" title="Leo Gau" /><!-- the google_analytics_id gets auto inserted from the config file -->
 
@@ -93,7 +93,7 @@ window.onload = wrap_img;
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">How I Implemented Speed Run ETH Challenge 1</h1><p class="page-description">How I Implemented Speed Run ETH Challenge 1</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-02-03T00:00:00-06:00" itemprop="datePublished">
+    <h1 class="post-title p-name" itemprop="name headline">How I Implemented Speed Run ETH Challenge 1: Decentralized Staking App</h1><p class="page-description">Explaining my accepted solution to Speed Run Ethereum Challenge 1</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-02-03T00:00:00-06:00" itemprop="datePublished">
         Feb 3, 2022
       </time>• 
           <span itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -121,8 +121,7 @@ window.onload = wrap_img;
 
   <div class="post-content e-content" itemprop="articleBody">
     <ul class="section-nav">
-<li class="toc-entry toc-h1"><a href="#draft">DRAFT</a></li>
-<li class="toc-entry toc-h1"><a href="#how-i-implemented-speed-run-eth-challenge-1">How I Implemented Speed Run ETH Challenge 1</a></li>
+<li class="toc-entry toc-h1"><a href="#how-i-implemented-speed-run-eth-challenge-1-decentralized-staking-app">How I Implemented Speed Run ETH Challenge 1: Decentralized Staking App</a></li>
 <li class="toc-entry toc-h1"><a href="#what-im-building">What I’m Building</a></li>
 <li class="toc-entry toc-h1"><a href="#the-code">The Code</a></li>
 <li class="toc-entry toc-h1"><a href="#checkpoint-2--staking-">Checkpoint 2: 🥩 Staking 💵</a>
@@ -133,18 +132,15 @@ window.onload = wrap_img;
 <li class="toc-entry toc-h1"><a href="#checkpoint-3--state-machine--timing-">Checkpoint 3: 🔬 State Machine / Timing ⏱</a></li>
 <li class="toc-entry toc-h1"><a href="#checkpoint-4--receive-function--ux-">Checkpoint 4: 💵 Receive Function / UX 🙎</a></li>
 <li class="toc-entry toc-h1"><a href="#so-what-did-we-do">So What Did We Do?</a></li>
-</ul><h1 id="draft">
-<a class="anchor" href="#draft" aria-hidden="true"><span class="octicon octicon-link"></span></a>DRAFT</h1>
-
-<h1 id="how-i-implemented-speed-run-eth-challenge-1">
-<a class="anchor" href="#how-i-implemented-speed-run-eth-challenge-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>How I Implemented Speed Run ETH Challenge 1</h1>
+</ul><h1 id="how-i-implemented-speed-run-eth-challenge-1-decentralized-staking-app">
+<a class="anchor" href="#how-i-implemented-speed-run-eth-challenge-1-decentralized-staking-app" aria-hidden="true"><span class="octicon octicon-link"></span></a>How I Implemented Speed Run ETH Challenge 1: Decentralized Staking App</h1>
 
 <h1 id="what-im-building">
 <a class="anchor" href="#what-im-building" aria-hidden="true"><span class="octicon octicon-link"></span></a>What I’m Building</h1>
 
 <p>In this post, I’ll show you how I implemented Challenge 1 of Speed Run ETH.</p>
 
-<p>Here’s the description from the challenge page: https://speedrunethereum.com/challenge/decentralized-staking</p>
+<p>Here’s the description from the challenge page: <a href="https://speedrunethereum.com/challenge/decentralized-staking">https://speedrunethereum.com/challenge/decentralized-staking</a></p>
 
 <blockquote>
   <p>🏦 Build a <code class="language-plaintext highlighter-rouge">Staker.sol</code> contract that collects <strong>ETH</strong> from numerous addresses using a payable <code class="language-plaintext highlighter-rouge">stake()</code> function and keeps track of <code class="language-plaintext highlighter-rouge">balances</code>. After some <code class="language-plaintext highlighter-rouge">deadline</code> if it has at least some <code class="language-plaintext highlighter-rouge">threshold</code> of ETH, it sends it to an <code class="language-plaintext highlighter-rouge">ExampleExternalContract</code> and triggers the <code class="language-plaintext highlighter-rouge">complete()</code> action sending the full balance. If not enough <strong>ETH</strong> is collected, allow users to <code class="language-plaintext highlighter-rouge">withdraw()</code>.</p>
@@ -153,9 +149,9 @@ window.onload = wrap_img;
 <h1 id="the-code">
 <a class="anchor" href="#the-code" aria-hidden="true"><span class="octicon octicon-link"></span></a>The Code</h1>
 
-<p>Deployed contract address: https://rinkeby.etherscan.io/address/0x137cbEAA01865C1Ca907e4692bc1307c72e3b9d4</p>
+<p>Deployed contract address: <a href="https://rinkeby.etherscan.io/address/0x137cbEAA01865C1Ca907e4692bc1307c72e3b9d4">https://rinkeby.etherscan.io/address/0x137cbEAA01865C1Ca907e4692bc1307c72e3b9d4</a></p>
 
-<p>Deployed UI: https://macabre-cakes.surge.sh/</p>
+<p>Deployed UI: <a href="https://macabre-cakes.surge.sh/">https://macabre-cakes.surge.sh/</a></p>
 
 <div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SPDX-License-Identifier: MIT
 </span><span class="k">pragma</span> <span class="n">solidity</span> <span class="mf">0.8</span><span class="p">.</span><span class="mi">4</span><span class="p">;</span>
@@ -427,11 +423,11 @@ receive() external payable {
 <h1 id="so-what-did-we-do">
 <a class="anchor" href="#so-what-did-we-do" aria-hidden="true"><span class="octicon octicon-link"></span></a>So What Did We Do?</h1>
 
-<p>I updated the code to point at the <code class="language-plaintext highlighter-rouge">Rinkeby</code> ethereum test net and deployed the frontend to https://macabre-cakes.surge.sh/</p>
+<p>I updated the code to point at the <code class="language-plaintext highlighter-rouge">Rinkeby</code> ethereum test net and deployed the frontend to <a href="https://macabre-cakes.surge.sh/">https://macabre-cakes.surge.sh/</a></p>
 
 <p>You can try it out for yourself although the staking period is over by now.</p>
 
-<p>Now on to Challenge 2.</p>
+<p>Now on to <a href="https://speedrunethereum.com/challenge/token-vendor">Challenge 2: Token Vendor</a>.</p>
 
 <p>See you then!</p>
 
