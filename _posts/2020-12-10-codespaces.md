@@ -5,7 +5,7 @@ comments: true
 hide: true
 toc: false
 layout: post
-hide: false
+hide: true
 categories: [codespaces, nbdev]
 image: images/fastpages_posts/codespaces/codespaces.png
 author: "<a href='https://twitter.com/HamelHusain'>Hamel Husain</a> & <a href='https://twitter.com/jeremyphoward'>Jeremy Howard</a>"
