@@ -1,6 +1,6 @@
 ---
-title: "How I Implemented Speed Run ETH Challenge 1"
-description: How I Implemented Speed Run ETH Challenge 1
+title: "How I Implemented Speed Run ETH Challenge 1: Decentralized Staking App"
+description: "Explaining my accepted solution to Speed Run Ethereum Challenge 1"
 toc: true
 comments: true
 layout: post
@@ -9,23 +9,21 @@ image: images/staker.png
 author: Leo Gau
 ---
 
-# DRAFT
-
-# How I Implemented Speed Run ETH Challenge 1
+# How I Implemented Speed Run ETH Challenge 1: Decentralized Staking App
 
 # What I'm Building
 
 In this post, I'll show you how I implemented Challenge 1 of Speed Run ETH.
 
-Here's the description from the challenge page: https://speedrunethereum.com/challenge/decentralized-staking
+Here's the description from the challenge page: [https://speedrunethereum.com/challenge/decentralized-staking](https://speedrunethereum.com/challenge/decentralized-staking)
 
 > 🏦 Build a `Staker.sol` contract that collects **ETH** from numerous addresses using a payable `stake()` function and keeps track of `balances`. After some `deadline` if it has at least some `threshold` of ETH, it sends it to an `ExampleExternalContract` and triggers the `complete()` action sending the full balance. If not enough **ETH** is collected, allow users to `withdraw()`.
 
 # The Code
 
-Deployed contract address: https://rinkeby.etherscan.io/address/0x137cbEAA01865C1Ca907e4692bc1307c72e3b9d4
+Deployed contract address: [https://rinkeby.etherscan.io/address/0x137cbEAA01865C1Ca907e4692bc1307c72e3b9d4](https://rinkeby.etherscan.io/address/0x137cbEAA01865C1Ca907e4692bc1307c72e3b9d4)
 
-Deployed UI: https://macabre-cakes.surge.sh/
+Deployed UI: [https://macabre-cakes.surge.sh/](https://macabre-cakes.surge.sh/)
 
 ```solidity
 // SPDX-License-Identifier: MIT
@@ -299,10 +297,10 @@ receive() external payable {
 
 # So What Did We Do?
 
-I updated the code to point at the `Rinkeby` ethereum test net and deployed the frontend to https://macabre-cakes.surge.sh/
+I updated the code to point at the `Rinkeby` ethereum test net and deployed the frontend to [https://macabre-cakes.surge.sh/](https://macabre-cakes.surge.sh/)
 
 You can try it out for yourself although the staking period is over by now.
 
-Now on to Challenge 2.
+Now on to [Challenge 2: Token Vendor](https://speedrunethereum.com/challenge/token-vendor).
 
 See you then!
