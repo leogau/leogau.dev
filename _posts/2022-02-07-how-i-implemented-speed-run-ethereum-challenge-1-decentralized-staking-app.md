@@ -4,7 +4,7 @@ description: "Explaining my accepted solution to Speed Run Ethereum Challenge 1"
 toc: true
 comments: true
 layout: post
-categories: [solidity, ethereum]
+categories: [solidity, ethereum, web3, cryptocurrency]
 image: images/staker.png
 author: Leo Gau
 ---
