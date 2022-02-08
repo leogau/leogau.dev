@@ -9,8 +9,6 @@ image: images/staker.png
 author: Leo Gau
 ---
 
-# How I Implemented Speed Run ETH Challenge 1: Decentralized Staking App
-
 # What I'm Building
 
 In this post, I'll show you how I implemented Challenge 1 of Speed Run ETH.
