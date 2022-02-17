@@ -21,7 +21,7 @@ Here's the description from the challenge page: [https://speedrunethereum.com/ch
 
 Deployed contract address: [https://rinkeby.etherscan.io/address/0x137cbEAA01865C1Ca907e4692bc1307c72e3b9d4](https://rinkeby.etherscan.io/address/0x137cbEAA01865C1Ca907e4692bc1307c72e3b9d4)
 
-Deployed UI: [https://macabre-cakes.surge.sh/](https://macabre-cakes.surge.sh/)
+Deployed UI: [https://hard-spiders.surge.sh/](https://hard-spiders.surge.sh/)
 
 ```solidity
 // SPDX-License-Identifier: MIT
@@ -295,7 +295,7 @@ receive() external payable {
 
 # So What Did We Do?
 
-I updated the code to point at the `Rinkeby` ethereum test net and deployed the frontend to [https://macabre-cakes.surge.sh/](https://macabre-cakes.surge.sh/)
+I updated the code to point at the `Rinkeby` ethereum test net and deployed the frontend to [https://hard-spiders.surge.sh/](https://hard-spiders.surge.sh/)
 
 You can try it out for yourself although the staking period is over by now.
 
