@@ -293,7 +293,7 @@ receive() external payable {
 }
 ```
 
-# So What Did We Do?
+# So What Did I Do?
 
 I updated the code to point at the `Rinkeby` ethereum test net and deployed the frontend to [https://hard-spiders.surge.sh/](https://hard-spiders.surge.sh/)
 
