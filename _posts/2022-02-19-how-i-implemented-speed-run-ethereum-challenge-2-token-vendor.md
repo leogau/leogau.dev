@@ -23,7 +23,7 @@ In this post, I'll show you how I implemented Challenge 2 of Speed Run Ethereum
 
 # The Code
 
-Deployed token contract: https://rinkeby.etherscan.io/address/0x2Bfd3d12bABf24711960afFA2518AfAbE401A440#code
+Deployed token contract: [https://rinkeby.etherscan.io/address/0x2Bfd3d12bABf24711960afFA2518AfAbE401A440#code](https://rinkeby.etherscan.io/address/0x2Bfd3d12bABf24711960afFA2518AfAbE401A440#code)
 
 ```solidity
 contract YourToken is ERC20 {
@@ -33,9 +33,7 @@ contract YourToken is ERC20 {
 }
 ```
 
-Deployed vendor contract:
-
-https://rinkeby.etherscan.io/address/0x759c77f4f268eAFf274C33b5047731CCA553cC94
+Deployed vendor contract: [https://rinkeby.etherscan.io/address/0x759c77f4f268eAFf274C33b5047731CCA553cC94](https://rinkeby.etherscan.io/address/0x759c77f4f268eAFf274C33b5047731CCA553cC94)
 
 ```solidity
 contract Vendor is Ownable {
@@ -180,11 +178,7 @@ Then we add a withdraw function so the owner can withdraw ETH from the contract
 
 In order to buy tokens back, we need to implement the "Approve" pattern for ERC20s
 
-
-
 ERC20 tokens will come with an Approve function. Update the UI to make the call. After the user approves, we can move the tokens out of their wallet back to the vendor. Then the vendor sends ETH to the caller.
-
-
 
 ```solidity
   /// Allow users to sell tokens back to the vendor
@@ -215,22 +209,12 @@ ERC20 tokens will come with an Approve function. Update the UI to make the call.
   }
 ```
 
-
-
 # So What Did I Do?
 
 I've now implemented a token vendor which can buy and sell the token that I created.
 
-
-
 At this point, I updated the code to deploy to Rinkeby and deployed the UI to surge.
-
-
 
 On to the next challenge.
 
-
-
 See you then!
-
-
