@@ -23,7 +23,7 @@ In this post, I'll show you how I implemented Challenge 2 of Speed Run Ethereum
 
 Deployed token contract: https://rinkeby.etherscan.io/address/0x2Bfd3d12bABf24711960afFA2518AfAbE401A440#code
 
-```
+```solidity
 contract YourToken is ERC20 {
     constructor() ERC20("Gold", "GLD") {
         _mint(msg.sender, 1000 * 10 ** 18);
@@ -35,7 +35,7 @@ Deployed vendor contract:
 
 https://rinkeby.etherscan.io/address/0x759c77f4f268eAFf274C33b5047731CCA553cC94
 
-```
+```solidity
 contract Vendor is Ownable {
   /// Reference to our ERC20 token contract
   YourToken public yourToken;
@@ -118,7 +118,7 @@ Deployed UI: [https://thundering-process.surge.sh/](https://thundering-process.s
 
 The first thing we need to do is create our ERC20 token. We're using the popular OpenZeppelin library to create the token. 
 
-```
+```solidity
 contract YourToken is ERC20 {
     constructor() ERC20("Gold", "GLD") {
         _mint(msg.sender, 1000 * 10 ** 18);
@@ -132,7 +132,7 @@ What we need to do is update the address we're minting too.  Otherwise this is b
 
 For this checkpoint, I need to implement the ability to buy these new tokens
 
-```
+```solidity
   // Events
   event BuyTokens(address buyer, uint256 amountOfETH, uint256 amountOfTokens);
 
@@ -159,14 +159,14 @@ For this checkpoint, I need to implement the ability to buy these new tokens
 
 After all the validation, we transfer tokens with
 
-```
+```solidity
 address buyer = msg.sender;
 (bool sent) = yourToken.transfer(buyer, amountOfTokens);
 ```
 
 and then emit the buy event so the UI can update
 
-```
+```solidity
 emit BuyTokens(buyer, amountOfEth, amountOfTokens);
 ```
 
@@ -188,7 +188,7 @@ This is why using sites like Uniswap is a 2 step process. You first need to appr
 
 The ERC20 token contract provided by OpenZeppelin comes with an Approve function. Update the UI to expose the button to approve. After the user approves, we can move the tokens out of their wallet back to the vendor. Then the vendor sends ETH to the caller.
 
-```
+```solidity
   /// Allow users to sell tokens back to the vendor
   function sellTokens(uint256 amount) public {
     // Validate token amount
