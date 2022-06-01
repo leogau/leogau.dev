@@ -160,91 +160,91 @@ window.onload = wrap_img;
 
 <p>Deployed token contract: https://rinkeby.etherscan.io/address/0x2Bfd3d12bABf24711960afFA2518AfAbE401A440#code</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>contract YourToken is ERC20 {
-    constructor() ERC20("Gold", "GLD") {
-        _mint(msg.sender, 1000 * 10 ** 18);
-    }
-}
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">contract</span> <span class="n">YourToken</span> <span class="k">is</span> <span class="n">ERC20</span> <span class="p">{</span>
+    <span class="k">constructor</span><span class="p">()</span> <span class="n">ERC20</span><span class="p">(</span><span class="s">"Gold"</span><span class="p">,</span> <span class="s">"GLD"</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">_mint</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">,</span> <span class="mi">1000</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">**</span> <span class="mi">18</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 </code></pre></div></div>
 
 <p>Deployed vendor contract:</p>
 
 <p>https://rinkeby.etherscan.io/address/0x759c77f4f268eAFf274C33b5047731CCA553cC94</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>contract Vendor is Ownable {
-  /// Reference to our ERC20 token contract
-  YourToken public yourToken;
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">contract</span> <span class="n">Vendor</span> <span class="k">is</span> <span class="n">Ownable</span> <span class="p">{</span>
+  <span class="c1">/// Reference to our ERC20 token contract
+</span>  <span class="n">YourToken</span> <span class="k">public</span> <span class="n">yourToken</span><span class="p">;</span>
 
-  /// Our token price
-  uint256 public constant tokensPerEth = 100;
+  <span class="c1">/// Our token price
+</span>  <span class="kt">uint256</span> <span class="k">public</span> <span class="k">constant</span> <span class="n">tokensPerEth</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
 
-  // Events
-  event BuyTokens(address buyer, uint256 amountOfETH, uint256 amountOfTokens);
-  event SellTokens(address buyer, uint256 amountOfETH, uint256 amountOfTokens);
+  <span class="c1">// Events
+</span>  <span class="k">event</span> <span class="n">BuyTokens</span><span class="p">(</span><span class="kt">address</span> <span class="n">buyer</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">amountOfETH</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">amountOfTokens</span><span class="p">);</span>
+  <span class="k">event</span> <span class="n">SellTokens</span><span class="p">(</span><span class="kt">address</span> <span class="n">buyer</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">amountOfETH</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">amountOfTokens</span><span class="p">);</span>
 
-  constructor(address tokenAddress) {
-    yourToken = YourToken(tokenAddress);
-  }
+  <span class="k">constructor</span><span class="p">(</span><span class="kt">address</span> <span class="n">tokenAddress</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">yourToken</span> <span class="o">=</span> <span class="n">YourToken</span><span class="p">(</span><span class="n">tokenAddress</span><span class="p">);</span>
+  <span class="p">}</span>
 
-  /// Allow users to buy tokens
-  function buyTokens() public payable {
-    // Validate the user sent eth
-    uint256 amountOfEth = msg.value;
-    require(amountOfEth &gt; 0, "Send some ETH to buy tokens");
+  <span class="c1">/// Allow users to buy tokens
+</span>  <span class="k">function</span> <span class="n">buyTokens</span><span class="p">()</span> <span class="k">public</span> <span class="k">payable</span> <span class="p">{</span>
+    <span class="c1">// Validate the user sent eth
+</span>    <span class="kt">uint256</span> <span class="n">amountOfEth</span> <span class="o">=</span> <span class="n">msg</span><span class="p">.</span><span class="n">value</span><span class="p">;</span>
+    <span class="nb">require</span><span class="p">(</span><span class="n">amountOfEth</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s">"Send some ETH to buy tokens"</span><span class="p">);</span>
 
-    // Validate the vendor has enough tokens
-    uint256 amountOfTokens = amountOfEth * tokensPerEth;
-    uint256 vendorBalance = yourToken.balanceOf(address(this));
-    require(vendorBalance &gt;= amountOfTokens, "Vendor does not have enough tokens");
+    <span class="c1">// Validate the vendor has enough tokens
+</span>    <span class="kt">uint256</span> <span class="n">amountOfTokens</span> <span class="o">=</span> <span class="n">amountOfEth</span> <span class="o">*</span> <span class="n">tokensPerEth</span><span class="p">;</span>
+    <span class="kt">uint256</span> <span class="n">vendorBalance</span> <span class="o">=</span> <span class="n">yourToken</span><span class="p">.</span><span class="n">balanceOf</span><span class="p">(</span><span class="kt">address</span><span class="p">(</span><span class="nb">this</span><span class="p">));</span>
+    <span class="nb">require</span><span class="p">(</span><span class="n">vendorBalance</span> <span class="o">&gt;=</span> <span class="n">amountOfTokens</span><span class="p">,</span> <span class="s">"Vendor does not have enough tokens"</span><span class="p">);</span>
 
-    // Send the tokens
-    address buyer = msg.sender;
-    (bool sent) = yourToken.transfer(buyer, amountOfTokens);
-    require(sent, "Failed to transfer token");
+    <span class="c1">// Send the tokens
+</span>    <span class="kt">address</span> <span class="n">buyer</span> <span class="o">=</span> <span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">;</span>
+    <span class="p">(</span><span class="kt">bool</span> <span class="n">sent</span><span class="p">)</span> <span class="o">=</span> <span class="n">yourToken</span><span class="p">.</span><span class="nb">transfer</span><span class="p">(</span><span class="n">buyer</span><span class="p">,</span> <span class="n">amountOfTokens</span><span class="p">);</span>
+    <span class="nb">require</span><span class="p">(</span><span class="n">sent</span><span class="p">,</span> <span class="s">"Failed to transfer token"</span><span class="p">);</span>
 
-    // Emit buy event
-    emit BuyTokens(buyer, amountOfEth, amountOfTokens);
-  }
+    <span class="c1">// Emit buy event
+</span>    <span class="k">emit</span> <span class="n">BuyTokens</span><span class="p">(</span><span class="n">buyer</span><span class="p">,</span> <span class="n">amountOfEth</span><span class="p">,</span> <span class="n">amountOfTokens</span><span class="p">);</span>
+  <span class="p">}</span>
 
-  /// Allow the owner to withdraw ETH
-  function withdraw() public onlyOwner {
-    // Validate the vendor has ETH to withdraw
-    uint256 vendorBalance = address(this).balance;
-    require(vendorBalance &gt; 0, "Vendor does not have any ETH to withdraw");
+  <span class="c1">/// Allow the owner to withdraw ETH
+</span>  <span class="k">function</span> <span class="n">withdraw</span><span class="p">()</span> <span class="k">public</span> <span class="n">onlyOwner</span> <span class="p">{</span>
+    <span class="c1">// Validate the vendor has ETH to withdraw
+</span>    <span class="kt">uint256</span> <span class="n">vendorBalance</span> <span class="o">=</span> <span class="kt">address</span><span class="p">(</span><span class="nb">this</span><span class="p">).</span><span class="nb">balance</span><span class="p">;</span>
+    <span class="nb">require</span><span class="p">(</span><span class="n">vendorBalance</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s">"Vendor does not have any ETH to withdraw"</span><span class="p">);</span>
 
-    // Send ETH
-    address owner = msg.sender;
-    (bool sent, ) = owner.call{value: vendorBalance}("");
-    require(sent, "Failed to withdraw");
-  }
+    <span class="c1">// Send ETH
+</span>    <span class="kt">address</span> <span class="n">owner</span> <span class="o">=</span> <span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">;</span>
+    <span class="p">(</span><span class="kt">bool</span> <span class="n">sent</span><span class="p">,</span> <span class="p">)</span> <span class="o">=</span> <span class="n">owner</span><span class="p">.</span><span class="nb">call</span><span class="p">{</span><span class="n">value</span><span class="o">:</span> <span class="n">vendorBalance</span><span class="p">}(</span><span class="s">""</span><span class="p">);</span>
+    <span class="nb">require</span><span class="p">(</span><span class="n">sent</span><span class="p">,</span> <span class="s">"Failed to withdraw"</span><span class="p">);</span>
+  <span class="p">}</span>
 
-  /// Allow users to sell tokens back to the vendor
-  function sellTokens(uint256 amount) public {
-    // Validate token amount
-    require(amount &gt; 0, "Must sell a token amount greater than 0");
+  <span class="c1">/// Allow users to sell tokens back to the vendor
+</span>  <span class="k">function</span> <span class="n">sellTokens</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">amount</span><span class="p">)</span> <span class="k">public</span> <span class="p">{</span>
+    <span class="c1">// Validate token amount
+</span>    <span class="nb">require</span><span class="p">(</span><span class="n">amount</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s">"Must sell a token amount greater than 0"</span><span class="p">);</span>
 
-    // Validate the user has the tokens to sell
-    address user = msg.sender;
-    uint256 userBalance = yourToken.balanceOf(user);
-    require(userBalance &gt;= amount, "User does not have enough tokens");
+    <span class="c1">// Validate the user has the tokens to sell
+</span>    <span class="kt">address</span> <span class="n">user</span> <span class="o">=</span> <span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">;</span>
+    <span class="kt">uint256</span> <span class="n">userBalance</span> <span class="o">=</span> <span class="n">yourToken</span><span class="p">.</span><span class="n">balanceOf</span><span class="p">(</span><span class="n">user</span><span class="p">);</span>
+    <span class="nb">require</span><span class="p">(</span><span class="n">userBalance</span> <span class="o">&gt;=</span> <span class="n">amount</span><span class="p">,</span> <span class="s">"User does not have enough tokens"</span><span class="p">);</span>
 
-    // Validate the vendor has enough ETH
-    uint256 amountOfEth = amount / tokensPerEth;
-    uint256 vendorEthBalance = address(this).balance;
-    require(vendorEthBalance &gt; amountOfEth, "Vendor does not have enough ETH");
+    <span class="c1">// Validate the vendor has enough ETH
+</span>    <span class="kt">uint256</span> <span class="n">amountOfEth</span> <span class="o">=</span> <span class="n">amount</span> <span class="o">/</span> <span class="n">tokensPerEth</span><span class="p">;</span>
+    <span class="kt">uint256</span> <span class="n">vendorEthBalance</span> <span class="o">=</span> <span class="kt">address</span><span class="p">(</span><span class="nb">this</span><span class="p">).</span><span class="nb">balance</span><span class="p">;</span>
+    <span class="nb">require</span><span class="p">(</span><span class="n">vendorEthBalance</span> <span class="o">&gt;</span> <span class="n">amountOfEth</span><span class="p">,</span> <span class="s">"Vendor does not have enough ETH"</span><span class="p">);</span>
 
-    // Transfer tokens
-    (bool sent) = yourToken.transferFrom(user, address(this), amount);
-    require(sent, "Failed to transfer tokens");
+    <span class="c1">// Transfer tokens
+</span>    <span class="p">(</span><span class="kt">bool</span> <span class="n">sent</span><span class="p">)</span> <span class="o">=</span> <span class="n">yourToken</span><span class="p">.</span><span class="n">transferFrom</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="kt">address</span><span class="p">(</span><span class="nb">this</span><span class="p">),</span> <span class="n">amount</span><span class="p">);</span>
+    <span class="nb">require</span><span class="p">(</span><span class="n">sent</span><span class="p">,</span> <span class="s">"Failed to transfer tokens"</span><span class="p">);</span>
 
-    // Transfer ETH
-    (bool ethSent, ) = user.call{value: amountOfEth }("");
-    require(ethSent, "Failed to send back eth");
+    <span class="c1">// Transfer ETH
+</span>    <span class="p">(</span><span class="kt">bool</span> <span class="n">ethSent</span><span class="p">,</span> <span class="p">)</span> <span class="o">=</span> <span class="n">user</span><span class="p">.</span><span class="nb">call</span><span class="p">{</span><span class="n">value</span><span class="o">:</span> <span class="n">amountOfEth</span> <span class="p">}(</span><span class="s">""</span><span class="p">);</span>
+    <span class="nb">require</span><span class="p">(</span><span class="n">ethSent</span><span class="p">,</span> <span class="s">"Failed to send back eth"</span><span class="p">);</span>
 
-    // Emit sell event
-    emit SellTokens(user, amountOfEth, amount);
-  }
-}
+    <span class="c1">// Emit sell event
+</span>    <span class="k">emit</span> <span class="n">SellTokens</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">amountOfEth</span><span class="p">,</span> <span class="n">amount</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
 </code></pre></div></div>
 
 <p>Deployed UI: <a href="https://thundering-process.surge.sh/">https://thundering-process.surge.sh/</a></p>
@@ -254,11 +254,11 @@ window.onload = wrap_img;
 
 <p>The first thing we need to do is create our ERC20 token. We’re using the popular OpenZeppelin library to create the token.</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>contract YourToken is ERC20 {
-    constructor() ERC20("Gold", "GLD") {
-        _mint(msg.sender, 1000 * 10 ** 18);
-    }
-}
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">contract</span> <span class="n">YourToken</span> <span class="k">is</span> <span class="n">ERC20</span> <span class="p">{</span>
+    <span class="k">constructor</span><span class="p">()</span> <span class="n">ERC20</span><span class="p">(</span><span class="s">"Gold"</span><span class="p">,</span> <span class="s">"GLD"</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">_mint</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">,</span> <span class="mi">1000</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">**</span> <span class="mi">18</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 </code></pre></div></div>
 
 <p>What we need to do is update the address we’re minting too.  Otherwise this is boilerplate for minting ERC20 tokens.</p>
@@ -268,39 +268,39 @@ window.onload = wrap_img;
 
 <p>For this checkpoint, I need to implement the ability to buy these new tokens</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  // Events
-  event BuyTokens(address buyer, uint256 amountOfETH, uint256 amountOfTokens);
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="c1">// Events
+</span>  <span class="k">event</span> <span class="n">BuyTokens</span><span class="p">(</span><span class="kt">address</span> <span class="n">buyer</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">amountOfETH</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">amountOfTokens</span><span class="p">);</span>
 
-  /// Allow users to buy tokens
-  function buyTokens() public payable {
-    // Validate the user sent eth
-    uint256 amountOfEth = msg.value;
-    require(amountOfEth &gt; 0, "Send some ETH to buy tokens");
+  <span class="c1">/// Allow users to buy tokens
+</span>  <span class="k">function</span> <span class="n">buyTokens</span><span class="p">()</span> <span class="k">public</span> <span class="k">payable</span> <span class="p">{</span>
+    <span class="c1">// Validate the user sent eth
+</span>    <span class="kt">uint256</span> <span class="n">amountOfEth</span> <span class="o">=</span> <span class="n">msg</span><span class="p">.</span><span class="n">value</span><span class="p">;</span>
+    <span class="nb">require</span><span class="p">(</span><span class="n">amountOfEth</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s">"Send some ETH to buy tokens"</span><span class="p">);</span>
 
-    // Validate the vendor has enough tokens
-    uint256 amountOfTokens = amountOfEth * tokensPerEth;
-    uint256 vendorBalance = yourToken.balanceOf(address(this));
-    require(vendorBalance &gt;= amountOfTokens, "Vendor does not have enough tokens");
+    <span class="c1">// Validate the vendor has enough tokens
+</span>    <span class="kt">uint256</span> <span class="n">amountOfTokens</span> <span class="o">=</span> <span class="n">amountOfEth</span> <span class="o">*</span> <span class="n">tokensPerEth</span><span class="p">;</span>
+    <span class="kt">uint256</span> <span class="n">vendorBalance</span> <span class="o">=</span> <span class="n">yourToken</span><span class="p">.</span><span class="n">balanceOf</span><span class="p">(</span><span class="kt">address</span><span class="p">(</span><span class="nb">this</span><span class="p">));</span>
+    <span class="nb">require</span><span class="p">(</span><span class="n">vendorBalance</span> <span class="o">&gt;=</span> <span class="n">amountOfTokens</span><span class="p">,</span> <span class="s">"Vendor does not have enough tokens"</span><span class="p">);</span>
 
-    // Send the tokens
-    address buyer = msg.sender;
-    (bool sent) = yourToken.transfer(buyer, amountOfTokens);
-    require(sent, "Failed to transfer token");
+    <span class="c1">// Send the tokens
+</span>    <span class="kt">address</span> <span class="n">buyer</span> <span class="o">=</span> <span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">;</span>
+    <span class="p">(</span><span class="kt">bool</span> <span class="n">sent</span><span class="p">)</span> <span class="o">=</span> <span class="n">yourToken</span><span class="p">.</span><span class="nb">transfer</span><span class="p">(</span><span class="n">buyer</span><span class="p">,</span> <span class="n">amountOfTokens</span><span class="p">);</span>
+    <span class="nb">require</span><span class="p">(</span><span class="n">sent</span><span class="p">,</span> <span class="s">"Failed to transfer token"</span><span class="p">);</span>
 
-    // Emit buy event
-    emit BuyTokens(buyer, amountOfEth, amountOfTokens);
-  }
+    <span class="c1">// Emit buy event
+</span>    <span class="k">emit</span> <span class="n">BuyTokens</span><span class="p">(</span><span class="n">buyer</span><span class="p">,</span> <span class="n">amountOfEth</span><span class="p">,</span> <span class="n">amountOfTokens</span><span class="p">);</span>
+  <span class="p">}</span>
 </code></pre></div></div>
 
 <p>After all the validation, we transfer tokens with</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>address buyer = msg.sender;
-(bool sent) = yourToken.transfer(buyer, amountOfTokens);
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">address</span> <span class="n">buyer</span> <span class="o">=</span> <span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">;</span>
+<span class="p">(</span><span class="kt">bool</span> <span class="n">sent</span><span class="p">)</span> <span class="o">=</span> <span class="n">yourToken</span><span class="p">.</span><span class="nb">transfer</span><span class="p">(</span><span class="n">buyer</span><span class="p">,</span> <span class="n">amountOfTokens</span><span class="p">);</span>
 </code></pre></div></div>
 
 <p>and then emit the buy event so the UI can update</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>emit BuyTokens(buyer, amountOfEth, amountOfTokens);
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">emit</span> <span class="n">BuyTokens</span><span class="p">(</span><span class="n">buyer</span><span class="p">,</span> <span class="n">amountOfEth</span><span class="p">,</span> <span class="n">amountOfTokens</span><span class="p">);</span>
 </code></pre></div></div>
 
 <p>Then we add a withdraw function so the owner can withdraw ETH from the contract</p>
@@ -328,32 +328,32 @@ window.onload = wrap_img;
 
 <p>The ERC20 token contract provided by OpenZeppelin comes with an Approve function. Update the UI to expose the button to approve. After the user approves, we can move the tokens out of their wallet back to the vendor. Then the vendor sends ETH to the caller.</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  /// Allow users to sell tokens back to the vendor
-  function sellTokens(uint256 amount) public {
-    // Validate token amount
-    require(amount &gt; 0, "Must sell a token amount greater than 0");
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="c1">/// Allow users to sell tokens back to the vendor
+</span>  <span class="k">function</span> <span class="n">sellTokens</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">amount</span><span class="p">)</span> <span class="k">public</span> <span class="p">{</span>
+    <span class="c1">// Validate token amount
+</span>    <span class="nb">require</span><span class="p">(</span><span class="n">amount</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s">"Must sell a token amount greater than 0"</span><span class="p">);</span>
 
-    // Validate the user has the tokens to sell
-    address user = msg.sender;
-    uint256 userBalance = yourToken.balanceOf(user);
-    require(userBalance &gt;= amount, "User does not have enough tokens");
+    <span class="c1">// Validate the user has the tokens to sell
+</span>    <span class="kt">address</span> <span class="n">user</span> <span class="o">=</span> <span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">;</span>
+    <span class="kt">uint256</span> <span class="n">userBalance</span> <span class="o">=</span> <span class="n">yourToken</span><span class="p">.</span><span class="n">balanceOf</span><span class="p">(</span><span class="n">user</span><span class="p">);</span>
+    <span class="nb">require</span><span class="p">(</span><span class="n">userBalance</span> <span class="o">&gt;=</span> <span class="n">amount</span><span class="p">,</span> <span class="s">"User does not have enough tokens"</span><span class="p">);</span>
 
-    // Validate the vendor has enough ETH
-    uint256 amountOfEth = amount / tokensPerEth;
-    uint256 vendorEthBalance = address(this).balance;
-    require(vendorEthBalance &gt; amountOfEth, "Vendor does not have enough ETH");
+    <span class="c1">// Validate the vendor has enough ETH
+</span>    <span class="kt">uint256</span> <span class="n">amountOfEth</span> <span class="o">=</span> <span class="n">amount</span> <span class="o">/</span> <span class="n">tokensPerEth</span><span class="p">;</span>
+    <span class="kt">uint256</span> <span class="n">vendorEthBalance</span> <span class="o">=</span> <span class="kt">address</span><span class="p">(</span><span class="nb">this</span><span class="p">).</span><span class="nb">balance</span><span class="p">;</span>
+    <span class="nb">require</span><span class="p">(</span><span class="n">vendorEthBalance</span> <span class="o">&gt;</span> <span class="n">amountOfEth</span><span class="p">,</span> <span class="s">"Vendor does not have enough ETH"</span><span class="p">);</span>
 
-    // Transfer tokens
-    (bool sent) = yourToken.transferFrom(user, address(this), amount);
-    require(sent, "Failed to transfer tokens");
+    <span class="c1">// Transfer tokens
+</span>    <span class="p">(</span><span class="kt">bool</span> <span class="n">sent</span><span class="p">)</span> <span class="o">=</span> <span class="n">yourToken</span><span class="p">.</span><span class="n">transferFrom</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="kt">address</span><span class="p">(</span><span class="nb">this</span><span class="p">),</span> <span class="n">amount</span><span class="p">);</span>
+    <span class="nb">require</span><span class="p">(</span><span class="n">sent</span><span class="p">,</span> <span class="s">"Failed to transfer tokens"</span><span class="p">);</span>
 
-    // Transfer ETH
-    (bool ethSent, ) = user.call{value: amountOfEth }("");
-    require(ethSent, "Failed to send back eth");
+    <span class="c1">// Transfer ETH
+</span>    <span class="p">(</span><span class="kt">bool</span> <span class="n">ethSent</span><span class="p">,</span> <span class="p">)</span> <span class="o">=</span> <span class="n">user</span><span class="p">.</span><span class="nb">call</span><span class="p">{</span><span class="n">value</span><span class="o">:</span> <span class="n">amountOfEth</span> <span class="p">}(</span><span class="s">""</span><span class="p">);</span>
+    <span class="nb">require</span><span class="p">(</span><span class="n">ethSent</span><span class="p">,</span> <span class="s">"Failed to send back eth"</span><span class="p">);</span>
 
-    // Emit sell event
-    emit SellTokens(user, amountOfEth, amount);
-  }
+    <span class="c1">// Emit sell event
+</span>    <span class="k">emit</span> <span class="n">SellTokens</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">amountOfEth</span><span class="p">,</span> <span class="n">amount</span><span class="p">);</span>
+  <span class="p">}</span>
 </code></pre></div></div>
 
 <h1 id="so-what-did-i-do">
