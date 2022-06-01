@@ -1,5 +1,5 @@
 ---
-title: "DRAFT - How I Implemented Speed Run Ethereum Challenge 2: Token Vendor"
+title: "How I Implemented Speed Run Ethereum Challenge 2: Token Vendor"
 description: "Explaining my accepted solution to Speed Run Ethereum Challenge 2"
 toc: true
 comments: true
@@ -8,8 +8,6 @@ categories: [solidity, ethereum, web3, cryptocurrency]
 image: images/tokenvendor.png
 author: Leo Gau
 ---
-
-# DRAFT
 
 # What I'm Building
 
@@ -23,9 +21,9 @@ In this post, I'll show you how I implemented Challenge 2 of Speed Run Ethereum
 
 # The Code
 
-Deployed token contract: [https://rinkeby.etherscan.io/address/0x2Bfd3d12bABf24711960afFA2518AfAbE401A440#code](https://rinkeby.etherscan.io/address/0x2Bfd3d12bABf24711960afFA2518AfAbE401A440#code)
+Deployed token contract: https://rinkeby.etherscan.io/address/0x2Bfd3d12bABf24711960afFA2518AfAbE401A440#code
 
-```solidity
+```
 contract YourToken is ERC20 {
     constructor() ERC20("Gold", "GLD") {
         _mint(msg.sender, 1000 * 10 ** 18);
@@ -33,9 +31,11 @@ contract YourToken is ERC20 {
 }
 ```
 
-Deployed vendor contract: [https://rinkeby.etherscan.io/address/0x759c77f4f268eAFf274C33b5047731CCA553cC94](https://rinkeby.etherscan.io/address/0x759c77f4f268eAFf274C33b5047731CCA553cC94)
+Deployed vendor contract:
 
-```solidity
+https://rinkeby.etherscan.io/address/0x759c77f4f268eAFf274C33b5047731CCA553cC94
+
+```
 contract Vendor is Ownable {
   /// Reference to our ERC20 token contract
   YourToken public yourToken;
@@ -118,7 +118,7 @@ Deployed UI: [https://thundering-process.surge.sh/](https://thundering-process.s
 
 The first thing we need to do is create our ERC20 token. We're using the popular OpenZeppelin library to create the token. 
 
-```solidity
+```
 contract YourToken is ERC20 {
     constructor() ERC20("Gold", "GLD") {
         _mint(msg.sender, 1000 * 10 ** 18);
@@ -128,13 +128,11 @@ contract YourToken is ERC20 {
 
 What we need to do is update the address we're minting too.  Otherwise this is boilerplate for minting ERC20 tokens.
 
-
-
 # Checkpoint 3: ⚖️ Vendor 🤖
 
 For this checkpoint, I need to implement the ability to buy these new tokens
 
-```solidity
+```
   // Events
   event BuyTokens(address buyer, uint256 amountOfETH, uint256 amountOfTokens);
 
@@ -161,7 +159,7 @@ For this checkpoint, I need to implement the ability to buy these new tokens
 
 After all the validation, we transfer tokens with
 
-```solidity
+```
 address buyer = msg.sender;
 (bool sent) = yourToken.transfer(buyer, amountOfTokens);
 ```
@@ -176,11 +174,21 @@ Then we add a withdraw function so the owner can withdraw ETH from the contract
 
 # Checkpoint 4: 🤔 Vendor Buyback 🤯
 
-In order to buy tokens back, we need to implement the "Approve" pattern for ERC20s
+In order to buy tokens back, we need to implement the "Approve" pattern for ERC20s.
 
-ERC20 tokens will come with an Approve function. Update the UI to make the call. After the user approves, we can move the tokens out of their wallet back to the vendor. Then the vendor sends ETH to the caller.
+## The Approve Pattern
 
-```solidity
+In order for a contract to move tokens in your wallet, you need to approve the contract to do so. This means that there needs to be 2 transactions in order for the vendor to buy your tokens back.
+
+1. Your wallet approves the vendor contract and an associated number of tokens.
+
+2. Your wallet sends the transaction to sell tokens back.
+   
+This is why using sites like Uniswap is a 2 step process. You first need to approve Uniswap to move the tokens for you and then send another transaction to actually swap the tokens.
+
+The ERC20 token contract provided by OpenZeppelin comes with an Approve function. Update the UI to expose the button to approve. After the user approves, we can move the tokens out of their wallet back to the vendor. Then the vendor sends ETH to the caller.
+
+```
   /// Allow users to sell tokens back to the vendor
   function sellTokens(uint256 amount) public {
     // Validate token amount
