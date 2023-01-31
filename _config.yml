@@ -40,10 +40,10 @@ baseurl: "" # the subpath of your site, e.g. "/blog".
 permalink: /:year/:month/:day/:title:output_ext
 
 # Github and twitter are optional:
-minima:
-  social_links:
-    twitter: leogau
-    github: leogau
+# minima:
+#   social_links:
+#     twitter: leogau
+#     github: leogau
 
 # Set this to true to get LaTeX math equation support
 use_math:
