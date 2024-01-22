@@ -14,5 +14,5 @@ _notebooks/.ipynb_checkpoints
 __pycache__
 _notebooks/.vscode/settings.json
 .DS_Store
-
+/_site/
 /.quarto/
