@@ -6,8 +6,11 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Leo Gau">
+<meta name="dcterms.date" content="2022-05-31">
+<meta name="description" content="Explaining my accepted solution to Speed Run Ethereum Challenge 2">
 
-<title>leogau.dev</title>
+<title>leogau.dev - How I Implemented Speed Run Ethereum Challenge 2: Token Vendor</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,24 +26,22 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -68,67 +69,9 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
 
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
 
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
-
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
-
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../../styles.css">
 </head>
 
 <body class="nav-fixed">
@@ -138,7 +81,7 @@ window.Quarto = {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">leogau.dev</span>
     </a>
   </div>
@@ -149,7 +92,7 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
+    <a class="nav-link" href="../../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item compact">
@@ -172,272 +115,263 @@ window.Quarto = {
 <!-- content -->
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-page-left">
-      <h1 class="title">leogau.dev</h1>
-                      </div>
+    <div class="quarto-title column-body">
+      <h1 class="title">How I Implemented Speed Run Ethereum Challenge 2: Token Vendor</h1>
+                  <div>
+        <div class="description">
+          Explaining my accepted solution to Speed Run Ethereum Challenge 2
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">solidity</div>
+                <div class="quarto-category">ethereum</div>
+                <div class="quarto-category">web3</div>
+                <div class="quarto-category">cryptocurrency</div>
+              </div>
+                  </div>
   </div>
     
   
-  <div class="quarto-title-meta column-page-left">
+  <div class="quarto-title-meta">
 
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Leo Gau </p>
+            </div>
+    </div>
       
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">May 31, 2022</p>
+      </div>
+    </div>
     
       
     </div>
     
   
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(6)</span></div><div class="category" data-category="Deep Learning">Deep Learning <span class="quarto-category-count">(4)</span></div><div class="category" data-category="Grokking Deep Learning">Grokking Deep Learning <span class="quarto-category-count">(4)</span></div><div class="category" data-category="Python">Python <span class="quarto-category-count">(4)</span></div><div class="category" data-category="cryptocurrency">cryptocurrency <span class="quarto-category-count">(2)</span></div><div class="category" data-category="ethereum">ethereum <span class="quarto-category-count">(2)</span></div><div class="category" data-category="solidity">solidity <span class="quarto-category-count">(2)</span></div><div class="category" data-category="web3">web3 <span class="quarto-category-count">(2)</span></div></div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#what-im-building" id="toc-what-im-building" class="nav-link active" data-scroll-target="#what-im-building">What I’m Building</a>
+  <ul class="collapse">
+  <li><a href="#challenge-2-token-vendor" id="toc-challenge-2-token-vendor" class="nav-link" data-scroll-target="#challenge-2-token-vendor">🚩 Challenge 2: 🏵 Token Vendor 🤖</a></li>
+  </ul></li>
+  <li><a href="#the-code" id="toc-the-code" class="nav-link" data-scroll-target="#the-code">The Code</a></li>
+  <li><a href="#checkpoint-2-your-token" id="toc-checkpoint-2-your-token" class="nav-link" data-scroll-target="#checkpoint-2-your-token">Checkpoint 2: 🏵Your Token 💵</a></li>
+  <li><a href="#checkpoint-3-vendor" id="toc-checkpoint-3-vendor" class="nav-link" data-scroll-target="#checkpoint-3-vendor">Checkpoint 3: ⚖️ Vendor 🤖</a></li>
+  <li><a href="#checkpoint-4-vendor-buyback" id="toc-checkpoint-4-vendor-buyback" class="nav-link" data-scroll-target="#checkpoint-4-vendor-buyback">Checkpoint 4: 🤔 Vendor Buyback 🤯</a>
+  <ul class="collapse">
+  <li><a href="#the-approve-pattern" id="toc-the-approve-pattern" class="nav-link" data-scroll-target="#the-approve-pattern">The Approve Pattern</a></li>
+  </ul></li>
+  <li><a href="#so-what-did-i-do" id="toc-so-what-did-i-do" class="nav-link" data-scroll-target="#so-what-did-i-do">So What Did I Do?</a></li>
+  </ul>
+</nav>
+    </div>
 <!-- main -->
-<main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
+<main class="content quarto-banner-title-block" id="quarto-document-content">
 
 
 
 
 
+<section id="what-im-building" class="level1">
+<h1>What I’m Building</h1>
+<p>In this post, I’ll show you how I implemented Challenge 2 of Speed Run Ethereum</p>
+<section id="challenge-2-token-vendor" class="level2">
+<h2 class="anchored" data-anchor-id="challenge-2-token-vendor">🚩 Challenge 2: 🏵 Token Vendor 🤖</h2>
+<blockquote class="blockquote">
+<p>🏵 Create <code>YourToken.sol</code> smart contract that inherits the <strong>ERC20</strong> token standard from OpenZeppelin. Set your token to <code>_mint()</code> <strong>1000</strong> (* 10 ** 18) tokens to the <code>msg.sender</code>. Then create a <code>Vendor.sol</code> contract that sells your token using a payable <code>buyTokens()</code> function.</p>
+</blockquote>
+<p><a href="https://speedrunethereum.com/challenge/token-vendor">Speed Run Ethereum</a></p>
+</section>
+</section>
+<section id="the-code" class="level1">
+<h1>The Code</h1>
+<p>Deployed token contract: https://rinkeby.etherscan.io/address/0x2Bfd3d12bABf24711960afFA2518AfAbE401A440#code</p>
+<pre class="solidity"><code>contract YourToken is ERC20 {
+    constructor() ERC20("Gold", "GLD") {
+        _mint(msg.sender, 1000 * 10 ** 18);
+    }
+}</code></pre>
+<p>Deployed vendor contract:</p>
+<p>https://rinkeby.etherscan.io/address/0x759c77f4f268eAFf274C33b5047731CCA553cC94</p>
+<pre class="solidity"><code>contract Vendor is Ownable {
+  /// Reference to our ERC20 token contract
+  YourToken public yourToken;
+
+  /// Our token price
+  uint256 public constant tokensPerEth = 100;
+
+  // Events
+  event BuyTokens(address buyer, uint256 amountOfETH, uint256 amountOfTokens);
+  event SellTokens(address buyer, uint256 amountOfETH, uint256 amountOfTokens);
+
+  constructor(address tokenAddress) {
+    yourToken = YourToken(tokenAddress);
+  }
+
+  /// Allow users to buy tokens
+  function buyTokens() public payable {
+    // Validate the user sent eth
+    uint256 amountOfEth = msg.value;
+    require(amountOfEth &gt; 0, "Send some ETH to buy tokens");
+
+    // Validate the vendor has enough tokens
+    uint256 amountOfTokens = amountOfEth * tokensPerEth;
+    uint256 vendorBalance = yourToken.balanceOf(address(this));
+    require(vendorBalance &gt;= amountOfTokens, "Vendor does not have enough tokens");
+
+    // Send the tokens
+    address buyer = msg.sender;
+    (bool sent) = yourToken.transfer(buyer, amountOfTokens);
+    require(sent, "Failed to transfer token");
+
+    // Emit buy event
+    emit BuyTokens(buyer, amountOfEth, amountOfTokens);
+  }
+
+  /// Allow the owner to withdraw ETH
+  function withdraw() public onlyOwner {
+    // Validate the vendor has ETH to withdraw
+    uint256 vendorBalance = address(this).balance;
+    require(vendorBalance &gt; 0, "Vendor does not have any ETH to withdraw");
+
+    // Send ETH
+    address owner = msg.sender;
+    (bool sent, ) = owner.call{value: vendorBalance}("");
+    require(sent, "Failed to withdraw");
+  }
+
+  /// Allow users to sell tokens back to the vendor
+  function sellTokens(uint256 amount) public {
+    // Validate token amount
+    require(amount &gt; 0, "Must sell a token amount greater than 0");
+
+    // Validate the user has the tokens to sell
+    address user = msg.sender;
+    uint256 userBalance = yourToken.balanceOf(user);
+    require(userBalance &gt;= amount, "User does not have enough tokens");
+
+    // Validate the vendor has enough ETH
+    uint256 amountOfEth = amount / tokensPerEth;
+    uint256 vendorEthBalance = address(this).balance;
+    require(vendorEthBalance &gt; amountOfEth, "Vendor does not have enough ETH");
+
+    // Transfer tokens
+    (bool sent) = yourToken.transferFrom(user, address(this), amount);
+    require(sent, "Failed to transfer tokens");
+
+    // Transfer ETH
+    (bool ethSent, ) = user.call{value: amountOfEth }("");
+    require(ethSent, "Failed to send back eth");
+
+    // Emit sell event
+    emit SellTokens(user, amountOfEth, amount);
+  }
+}</code></pre>
+<p>Deployed UI: <a href="https://thundering-process.surge.sh/">https://thundering-process.surge.sh/</a></p>
+</section>
+<section id="checkpoint-2-your-token" class="level1">
+<h1>Checkpoint 2: 🏵Your Token 💵</h1>
+<p>The first thing we need to do is create our ERC20 token. We’re using the popular OpenZeppelin library to create the token.</p>
+<pre class="solidity"><code>contract YourToken is ERC20 {
+    constructor() ERC20("Gold", "GLD") {
+        _mint(msg.sender, 1000 * 10 ** 18);
+    }
+}</code></pre>
+<p>What we need to do is update the address we’re minting too. Otherwise this is boilerplate for minting ERC20 tokens.</p>
+</section>
+<section id="checkpoint-3-vendor" class="level1">
+<h1>Checkpoint 3: ⚖️ Vendor 🤖</h1>
+<p>For this checkpoint, I need to implement the ability to buy these new tokens</p>
+<pre class="solidity"><code>  // Events
+  event BuyTokens(address buyer, uint256 amountOfETH, uint256 amountOfTokens);
+
+  /// Allow users to buy tokens
+  function buyTokens() public payable {
+    // Validate the user sent eth
+    uint256 amountOfEth = msg.value;
+    require(amountOfEth &gt; 0, "Send some ETH to buy tokens");
+
+    // Validate the vendor has enough tokens
+    uint256 amountOfTokens = amountOfEth * tokensPerEth;
+    uint256 vendorBalance = yourToken.balanceOf(address(this));
+    require(vendorBalance &gt;= amountOfTokens, "Vendor does not have enough tokens");
+
+    // Send the tokens
+    address buyer = msg.sender;
+    (bool sent) = yourToken.transfer(buyer, amountOfTokens);
+    require(sent, "Failed to transfer token");
+
+    // Emit buy event
+    emit BuyTokens(buyer, amountOfEth, amountOfTokens);
+  }</code></pre>
+<p>After all the validation, we transfer tokens with</p>
+<pre class="solidity"><code>address buyer = msg.sender;
+(bool sent) = yourToken.transfer(buyer, amountOfTokens);</code></pre>
+<p>and then emit the buy event so the UI can update</p>
+<pre class="solidity"><code>emit BuyTokens(buyer, amountOfEth, amountOfTokens);</code></pre>
+<p>Then we add a withdraw function so the owner can withdraw ETH from the contract</p>
+</section>
+<section id="checkpoint-4-vendor-buyback" class="level1">
+<h1>Checkpoint 4: 🤔 Vendor Buyback 🤯</h1>
+<p>In order to buy tokens back, we need to implement the “Approve” pattern for ERC20s.</p>
+<section id="the-approve-pattern" class="level2">
+<h2 class="anchored" data-anchor-id="the-approve-pattern">The Approve Pattern</h2>
+<p>In order for a contract to move tokens in your wallet, you need to approve the contract to do so. This means that there needs to be 2 transactions in order for the vendor to buy your tokens back.</p>
+<ol type="1">
+<li><p>Your wallet approves the vendor contract and an associated number of tokens.</p></li>
+<li><p>Your wallet sends the transaction to sell tokens back.</p></li>
+</ol>
+<p>This is why using sites like Uniswap is a 2 step process. You first need to approve Uniswap to move the tokens for you and then send another transaction to actually swap the tokens.</p>
+<p>The ERC20 token contract provided by OpenZeppelin comes with an Approve function. Update the UI to expose the button to approve. After the user approves, we can move the tokens out of their wallet back to the vendor. Then the vendor sends ETH to the caller.</p>
+<pre class="solidity"><code>  /// Allow users to sell tokens back to the vendor
+  function sellTokens(uint256 amount) public {
+    // Validate token amount
+    require(amount &gt; 0, "Must sell a token amount greater than 0");
+
+    // Validate the user has the tokens to sell
+    address user = msg.sender;
+    uint256 userBalance = yourToken.balanceOf(user);
+    require(userBalance &gt;= amount, "User does not have enough tokens");
+
+    // Validate the vendor has enough ETH
+    uint256 amountOfEth = amount / tokensPerEth;
+    uint256 vendorEthBalance = address(this).balance;
+    require(vendorEthBalance &gt; amountOfEth, "Vendor does not have enough ETH");
+
+    // Transfer tokens
+    (bool sent) = yourToken.transferFrom(user, address(this), amount);
+    require(sent, "Failed to transfer tokens");
+
+    // Transfer ETH
+    (bool ethSent, ) = user.call{value: amountOfEth }("");
+    require(ethSent, "Failed to send back eth");
+
+    // Emit sell event
+    emit SellTokens(user, amountOfEth, amount);
+  }</code></pre>
+</section>
+</section>
+<section id="so-what-did-i-do" class="level1">
+<h1>So What Did I Do?</h1>
+<p>I’ve now implemented a token vendor which can buy and sell the token that I created.</p>
+<p>At this point, I updated the code to deploy to Rinkeby and deployed the UI to surge.</p>
+<p>On to the next challenge.</p>
+<p>See you then!</p>
 
 
+</section>
 
-
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="solidity,ethereum,web3,cryptocurrency" data-listing-date-sort="1653980400000" data-listing-file-modified-sort="1705890782590" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="6" data-listing-word-count-sort="1194">
-<div class="thumbnail">
-<p><a href="./posts/2021-03-10-MNIST-Numpy_files/2022-05-31-how-i-implemented-speed-run-ethereum-challenge-2-token-vendor.html" class="no-external"></a></p><a href="./posts/2021-03-10-MNIST-Numpy_files/2022-05-31-how-i-implemented-speed-run-ethereum-challenge-2-token-vendor.html" class="no-external">
-<p><img src="./posts/2021-03-10-MNIST-Numpy_files/images/tokenvendor.png" class="thumbnail-image"></p>
-</a><p><a href="./posts/2021-03-10-MNIST-Numpy_files/2022-05-31-how-i-implemented-speed-run-ethereum-challenge-2-token-vendor.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/2021-03-10-MNIST-Numpy_files/2022-05-31-how-i-implemented-speed-run-ethereum-challenge-2-token-vendor.html" class="no-external">How I Implemented Speed Run Ethereum Challenge 2: Token Vendor</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/2021-03-10-MNIST-Numpy_files/2022-05-31-how-i-implemented-speed-run-ethereum-challenge-2-token-vendor.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('solidity'); return false;">
-solidity
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('ethereum'); return false;">
-ethereum
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('web3'); return false;">
-web3
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('cryptocurrency'); return false;">
-cryptocurrency
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/2021-03-10-MNIST-Numpy_files/2022-05-31-how-i-implemented-speed-run-ethereum-challenge-2-token-vendor.html" class="no-external">Explaining my accepted solution to Speed Run Ethereum Challenge 2</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/2021-03-10-MNIST-Numpy_files/2022-05-31-how-i-implemented-speed-run-ethereum-challenge-2-token-vendor.html" class="no-external">
-<div class="listing-date">
-May 31, 2022
-</div>
-<div class="listing-author">
-Leo Gau
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="1" data-categories="solidity,ethereum,web3,cryptocurrency" data-listing-date-sort="1644220800000" data-listing-file-modified-sort="1705890782590" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="9" data-listing-word-count-sort="1779">
-<div class="thumbnail">
-<p><a href="./posts/2021-03-10-MNIST-Numpy_files/2022-02-07-how-i-implemented-speed-run-ethereum-challenge-1-decentralized-staking-app.html" class="no-external"></a></p><a href="./posts/2021-03-10-MNIST-Numpy_files/2022-02-07-how-i-implemented-speed-run-ethereum-challenge-1-decentralized-staking-app.html" class="no-external">
-<p><img src="./posts/2021-03-10-MNIST-Numpy_files/images/staker.png" class="thumbnail-image"></p>
-</a><p><a href="./posts/2021-03-10-MNIST-Numpy_files/2022-02-07-how-i-implemented-speed-run-ethereum-challenge-1-decentralized-staking-app.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/2021-03-10-MNIST-Numpy_files/2022-02-07-how-i-implemented-speed-run-ethereum-challenge-1-decentralized-staking-app.html" class="no-external">How I Implemented Speed Run Ethereum Challenge 1: Decentralized Staking App</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/2021-03-10-MNIST-Numpy_files/2022-02-07-how-i-implemented-speed-run-ethereum-challenge-1-decentralized-staking-app.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('solidity'); return false;">
-solidity
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('ethereum'); return false;">
-ethereum
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('web3'); return false;">
-web3
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('cryptocurrency'); return false;">
-cryptocurrency
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/2021-03-10-MNIST-Numpy_files/2022-02-07-how-i-implemented-speed-run-ethereum-challenge-1-decentralized-staking-app.html" class="no-external">Explaining my accepted solution to Speed Run Ethereum Challenge 1</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/2021-03-10-MNIST-Numpy_files/2022-02-07-how-i-implemented-speed-run-ethereum-challenge-1-decentralized-staking-app.html" class="no-external">
-<div class="listing-date">
-Feb 7, 2022
-</div>
-<div class="listing-author">
-Leo Gau
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="2" data-categories="Grokking Deep Learning,Deep Learning,Python" data-listing-date-sort="1615878000000" data-listing-file-modified-sort="1705890782594" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="6" data-listing-word-count-sort="1139">
-<div class="thumbnail">
-<p><a href="./posts/2021-03-16-mnist-deep-neural-network.html" class="no-external"></a></p><a href="./posts/2021-03-16-mnist-deep-neural-network.html" class="no-external">
-<p><img src="./posts/images/hiddenlayer.png" class="thumbnail-image"></p>
-</a><p><a href="./posts/2021-03-16-mnist-deep-neural-network.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/2021-03-16-mnist-deep-neural-network.html" class="no-external">Identify MNIST Digits With 97% Accuracy By Using A 2 Layer Neural Network</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/2021-03-16-mnist-deep-neural-network.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Grokking Deep Learning'); return false;">
-Grokking Deep Learning
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Deep Learning'); return false;">
-Deep Learning
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Python'); return false;">
-Python
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/2021-03-16-mnist-deep-neural-network.html" class="no-external">Adding a hidden layer increased my accuracy by over 20%</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/2021-03-16-mnist-deep-neural-network.html" class="no-external">
-<div class="listing-date">
-Mar 16, 2021
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="3" data-categories="Grokking Deep Learning,Deep Learning,Python" data-listing-date-sort="1615363200000" data-listing-file-modified-sort="1705890782590" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="249">
-<div class="thumbnail">
-<p><a href="./posts/2021-03-10-mnist-numpy.html" class="no-external"></a></p><a href="./posts/2021-03-10-mnist-numpy.html" class="no-external">
-<p><img src="./posts/images/numpylogodark.png" class="thumbnail-image"></p>
-</a><p><a href="./posts/2021-03-10-mnist-numpy.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/2021-03-10-mnist-numpy.html" class="no-external">How I Go From 70 Lines Of Code To Only 26 Using The NumPy Library</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/2021-03-10-mnist-numpy.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Grokking Deep Learning'); return false;">
-Grokking Deep Learning
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Deep Learning'); return false;">
-Deep Learning
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Python'); return false;">
-Python
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/2021-03-10-mnist-numpy.html" class="no-external">Replacing my hand written math functions with NumPy</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/2021-03-10-mnist-numpy.html" class="no-external">
-<div class="listing-date">
-Mar 10, 2021
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="4" data-categories="Grokking Deep Learning,Deep Learning,Python" data-listing-date-sort="1614499200000" data-listing-file-modified-sort="1705890782586" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="8" data-listing-word-count-sort="1410">
-<div class="thumbnail">
-<p><a href="./posts/2021-02-28-mnist.html" class="no-external"></a></p><a href="./posts/2021-02-28-mnist.html" class="no-external">
-<p><img src="./posts/images/MnistExamples.png" class="thumbnail-image"></p>
-</a><p><a href="./posts/2021-02-28-mnist.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/2021-02-28-mnist.html" class="no-external">How I Identify Handwritten Digits Using Only Python</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/2021-02-28-mnist.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Grokking Deep Learning'); return false;">
-Grokking Deep Learning
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Deep Learning'); return false;">
-Deep Learning
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Python'); return false;">
-Python
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/2021-02-28-mnist.html" class="no-external">Training a neural network to correctly identify digits from the MNIST dataset</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/2021-02-28-mnist.html" class="no-external">
-<div class="listing-date">
-Feb 28, 2021
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="5" data-categories="Grokking Deep Learning,Deep Learning,Python" data-listing-date-sort="1611302400000" data-listing-file-modified-sort="1705890782584" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1211">
-<div class="thumbnail">
-<p><a href="./posts/2021-01-22-how-i-implemented-the-most-simple-neural-net.html" class="no-external"></a></p><a href="./posts/2021-01-22-how-i-implemented-the-most-simple-neural-net.html" class="no-external">
-<p><img src="./posts/images/SimpleNN.png" class="thumbnail-image"></p>
-</a><p><a href="./posts/2021-01-22-how-i-implemented-the-most-simple-neural-net.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/2021-01-22-how-i-implemented-the-most-simple-neural-net.html" class="no-external">How I Implemented The Most Simple Neural Network Using Python</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/2021-01-22-how-i-implemented-the-most-simple-neural-net.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Grokking Deep Learning'); return false;">
-Grokking Deep Learning
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Deep Learning'); return false;">
-Deep Learning
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Python'); return false;">
-Python
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/2021-01-22-how-i-implemented-the-most-simple-neural-net.html" class="no-external">Training a neural network to output ‘42’ when given ‘5’</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/2021-01-22-how-i-implemented-the-most-simple-neural-net.html" class="no-external">
-<div class="listing-date">
-Jan 22, 2021
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none">
-No matching items
-</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

@@ -1,71 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<url>
-<loc>https://leogau.dev/2020/01/14/test-markdown-post.html</loc>
-<lastmod>2020-01-14T00:00:00-06:00</lastmod>
-</url>
-<url>
-<loc>https://leogau.dev/2020/02/20/test.html</loc>
-<lastmod>2020-02-20T00:00:00-06:00</lastmod>
-</url>
-<url>
-<loc>https://leogau.dev/2020/02/21/introducing-fastpages.html</loc>
-<lastmod>2020-02-21T00:00:00-06:00</lastmod>
-</url>
-<url>
-<loc>https://leogau.dev/2020/03/06/fastpages-actions.html</loc>
-<lastmod>2020-03-06T00:00:00-06:00</lastmod>
-</url>
-<url>
-<loc>https://leogau.dev/fastcore/</loc>
-<lastmod>2020-09-01T00:00:00-05:00</lastmod>
-</url>
-<url>
-<loc>https://leogau.dev/fastlinkcheck/</loc>
-<lastmod>2020-11-17T00:00:00-06:00</lastmod>
-</url>
-<url>
-<loc>https://leogau.dev/codespaces</loc>
-<lastmod>2020-12-10T00:00:00-06:00</lastmod>
-</url>
-<url>
-<loc>https://leogau.dev/2021/01/22/How-I-Implemented-The-Most-Simple-Neural-Net.html</loc>
-<lastmod>2021-01-22T00:00:00-06:00</lastmod>
-</url>
-<url>
-<loc>https://leogau.dev/2021/02/28/MNIST.html</loc>
-<lastmod>2021-02-28T00:00:00-06:00</lastmod>
-</url>
-<url>
-<loc>https://leogau.dev/2021/03/10/MNIST-Numpy.html</loc>
-<lastmod>2021-03-10T00:00:00-06:00</lastmod>
-</url>
-<url>
-<loc>https://leogau.dev/2021/03/16/MNIST-Deep-Neural-Network.html</loc>
-<lastmod>2021-03-16T00:00:00-05:00</lastmod>
-</url>
-<url>
-<loc>https://leogau.dev/2022/02/07/how-i-implemented-speed-run-ethereum-challenge-1-decentralized-staking-app.html</loc>
-<lastmod>2022-02-07T00:00:00-06:00</lastmod>
-</url>
-<url>
-<loc>https://leogau.dev/2022/05/31/how-i-implemented-speed-run-ethereum-challenge-2-token-vendor.html</loc>
-<lastmod>2022-05-31T00:00:00-05:00</lastmod>
-</url>
-<url>
-<loc>https://leogau.dev/2023/01/31/Recognize-digits-with-fastai.html</loc>
-<lastmod>2023-01-31T00:00:00-06:00</lastmod>
-</url>
-<url>
-<loc>https://leogau.dev/about/</loc>
-</url>
-<url>
-<loc>https://leogau.dev/</loc>
-</url>
-<url>
-<loc>https://leogau.dev/search/</loc>
-</url>
-<url>
-<loc>https://leogau.dev/categories/</loc>
-</url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://leogau.github.io/leogau.dev/about.html</loc>
+    <lastmod>2024-01-22T02:33:02.580Z</lastmod>
+  </url>
+  <url>
+    <loc>https://leogau.github.io/leogau.dev/posts/2021-03-16-mnist-deep-neural-network.html</loc>
+    <lastmod>2024-01-22T02:33:02.594Z</lastmod>
+  </url>
+  <url>
+    <loc>https://leogau.github.io/leogau.dev/posts/2021-03-10-mnist-numpy.html</loc>
+    <lastmod>2024-01-22T02:33:02.590Z</lastmod>
+  </url>
+  <url>
+    <loc>https://leogau.github.io/leogau.dev/posts/2021-03-10-MNIST-Numpy_files/2022-02-07-how-i-implemented-speed-run-ethereum-challenge-1-decentralized-staking-app.html</loc>
+    <lastmod>2024-01-22T02:33:02.590Z</lastmod>
+  </url>
+  <url>
+    <loc>https://leogau.github.io/leogau.dev/posts/2021-03-10-MNIST-Numpy_files/2022-05-31-how-i-implemented-speed-run-ethereum-challenge-2-token-vendor.html</loc>
+    <lastmod>2024-01-22T02:33:02.590Z</lastmod>
+  </url>
+  <url>
+    <loc>https://leogau.github.io/leogau.dev/posts/2021-01-22-how-i-implemented-the-most-simple-neural-net.html</loc>
+    <lastmod>2024-01-22T02:33:02.584Z</lastmod>
+  </url>
+  <url>
+    <loc>https://leogau.github.io/leogau.dev/posts/2021-02-28-mnist.html</loc>
+    <lastmod>2024-01-22T02:33:02.586Z</lastmod>
+  </url>
+  <url>
+    <loc>https://leogau.github.io/leogau.dev/index.html</loc>
+    <lastmod>2024-01-22T02:33:02.582Z</lastmod>
+  </url>
 </urlset>
