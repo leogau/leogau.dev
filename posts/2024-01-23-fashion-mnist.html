@@ -7,10 +7,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Leo Gau">
-<meta name="dcterms.date" content="2022-05-31">
-<meta name="description" content="Explaining my accepted solution to Speed Run Ethereum Challenge 2">
+<meta name="dcterms.date" content="2024-01-23">
+<meta name="description" content="Training a neural network using PyTorch to correctly identify articles of clothes from the Fashion-MNIST dataset">
 
-<title>leogau.dev - How I Implemented Speed Run Ethereum Challenge 2: Token Vendor</title>
+<title>leogau.dev - Using PyTorch to identify clothes</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -116,17 +116,16 @@ ul.task-list li input[type="checkbox"] {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">How I Implemented Speed Run Ethereum Challenge 2: Token Vendor</h1>
+      <h1 class="title">Using PyTorch to identify clothes</h1>
                   <div>
         <div class="description">
-          Explaining my accepted solution to Speed Run Ethereum Challenge 2
+          Training a neural network using PyTorch to correctly identify articles of clothes from the Fashion-MNIST dataset
         </div>
       </div>
                           <div class="quarto-categories">
-                <div class="quarto-category">solidity</div>
-                <div class="quarto-category">ethereum</div>
-                <div class="quarto-category">web3</div>
-                <div class="quarto-category">cryptocurrency</div>
+                <div class="quarto-category">PyTorch</div>
+                <div class="quarto-category">Deep Learning</div>
+                <div class="quarto-category">Python</div>
               </div>
                   </div>
   </div>
@@ -144,7 +143,7 @@ ul.task-list li input[type="checkbox"] {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">May 31, 2022</p>
+        <p class="date">January 23, 2024</p>
       </div>
     </div>
     
@@ -160,18 +159,8 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#what-im-building" id="toc-what-im-building" class="nav-link active" data-scroll-target="#what-im-building">What I’m Building</a>
-  <ul class="collapse">
-  <li><a href="#challenge-2-token-vendor" id="toc-challenge-2-token-vendor" class="nav-link" data-scroll-target="#challenge-2-token-vendor">🚩 Challenge 2: 🏵 Token Vendor 🤖</a></li>
-  </ul></li>
+  <li><a href="#what-im-building" id="toc-what-im-building" class="nav-link active" data-scroll-target="#what-im-building">What I’m Building</a></li>
   <li><a href="#the-code" id="toc-the-code" class="nav-link" data-scroll-target="#the-code">The Code</a></li>
-  <li><a href="#checkpoint-2-your-token" id="toc-checkpoint-2-your-token" class="nav-link" data-scroll-target="#checkpoint-2-your-token">Checkpoint 2: 🏵Your Token 💵</a></li>
-  <li><a href="#checkpoint-3-vendor" id="toc-checkpoint-3-vendor" class="nav-link" data-scroll-target="#checkpoint-3-vendor">Checkpoint 3: ⚖️ Vendor 🤖</a></li>
-  <li><a href="#checkpoint-4-vendor-buyback" id="toc-checkpoint-4-vendor-buyback" class="nav-link" data-scroll-target="#checkpoint-4-vendor-buyback">Checkpoint 4: 🤔 Vendor Buyback 🤯</a>
-  <ul class="collapse">
-  <li><a href="#the-approve-pattern" id="toc-the-approve-pattern" class="nav-link" data-scroll-target="#the-approve-pattern">The Approve Pattern</a></li>
-  </ul></li>
-  <li><a href="#so-what-did-i-do" id="toc-so-what-did-i-do" class="nav-link" data-scroll-target="#so-what-did-i-do">So What Did I Do?</a></li>
   </ul>
 </nav>
     </div>
@@ -184,189 +173,13 @@ ul.task-list li input[type="checkbox"] {
 
 <section id="what-im-building" class="level1">
 <h1>What I’m Building</h1>
-<p>In this post, I’ll show you how I implemented Challenge 2 of Speed Run Ethereum</p>
-<section id="challenge-2-token-vendor" class="level2">
-<h2 class="anchored" data-anchor-id="challenge-2-token-vendor">🚩 Challenge 2: 🏵 Token Vendor 🤖</h2>
-<blockquote class="blockquote">
-<p>🏵 Create <code>YourToken.sol</code> smart contract that inherits the <strong>ERC20</strong> token standard from OpenZeppelin. Set your token to <code>_mint()</code> <strong>1000</strong> (* 10 ** 18) tokens to the <code>msg.sender</code>. Then create a <code>Vendor.sol</code> contract that sells your token using a payable <code>buyTokens()</code> function.</p>
-</blockquote>
-<p><a href="https://speedrunethereum.com/challenge/token-vendor">Speed Run Ethereum</a></p>
-</section>
+<p>In this post, I’ll show you how I build a neural network to identify articles of clothes from the Fashion MNIST dataset. Fashion MNIST is a direct drop-in replacement for the popular MNIST dataset so it shares the same 28x28 image size and structure of MNIST.</p>
+<p>The training set contains 60,000 images of clothes associated with 10 different classes. The task is to classify a given image as the correct article of clothing.</p>
+<p>Instead of using only Python, I’m going to build on the previous posts and use the PyTorch library to build this neural network.</p>
+<p>Let’s get started.</p>
 </section>
 <section id="the-code" class="level1">
 <h1>The Code</h1>
-<p>Deployed token contract: https://rinkeby.etherscan.io/address/0x2Bfd3d12bABf24711960afFA2518AfAbE401A440#code</p>
-<pre class="solidity"><code>contract YourToken is ERC20 {
-    constructor() ERC20("Gold", "GLD") {
-        _mint(msg.sender, 1000 * 10 ** 18);
-    }
-}</code></pre>
-<p>Deployed vendor contract:</p>
-<p>https://rinkeby.etherscan.io/address/0x759c77f4f268eAFf274C33b5047731CCA553cC94</p>
-<pre class="solidity"><code>contract Vendor is Ownable {
-  /// Reference to our ERC20 token contract
-  YourToken public yourToken;
-
-  /// Our token price
-  uint256 public constant tokensPerEth = 100;
-
-  // Events
-  event BuyTokens(address buyer, uint256 amountOfETH, uint256 amountOfTokens);
-  event SellTokens(address buyer, uint256 amountOfETH, uint256 amountOfTokens);
-
-  constructor(address tokenAddress) {
-    yourToken = YourToken(tokenAddress);
-  }
-
-  /// Allow users to buy tokens
-  function buyTokens() public payable {
-    // Validate the user sent eth
-    uint256 amountOfEth = msg.value;
-    require(amountOfEth &gt; 0, "Send some ETH to buy tokens");
-
-    // Validate the vendor has enough tokens
-    uint256 amountOfTokens = amountOfEth * tokensPerEth;
-    uint256 vendorBalance = yourToken.balanceOf(address(this));
-    require(vendorBalance &gt;= amountOfTokens, "Vendor does not have enough tokens");
-
-    // Send the tokens
-    address buyer = msg.sender;
-    (bool sent) = yourToken.transfer(buyer, amountOfTokens);
-    require(sent, "Failed to transfer token");
-
-    // Emit buy event
-    emit BuyTokens(buyer, amountOfEth, amountOfTokens);
-  }
-
-  /// Allow the owner to withdraw ETH
-  function withdraw() public onlyOwner {
-    // Validate the vendor has ETH to withdraw
-    uint256 vendorBalance = address(this).balance;
-    require(vendorBalance &gt; 0, "Vendor does not have any ETH to withdraw");
-
-    // Send ETH
-    address owner = msg.sender;
-    (bool sent, ) = owner.call{value: vendorBalance}("");
-    require(sent, "Failed to withdraw");
-  }
-
-  /// Allow users to sell tokens back to the vendor
-  function sellTokens(uint256 amount) public {
-    // Validate token amount
-    require(amount &gt; 0, "Must sell a token amount greater than 0");
-
-    // Validate the user has the tokens to sell
-    address user = msg.sender;
-    uint256 userBalance = yourToken.balanceOf(user);
-    require(userBalance &gt;= amount, "User does not have enough tokens");
-
-    // Validate the vendor has enough ETH
-    uint256 amountOfEth = amount / tokensPerEth;
-    uint256 vendorEthBalance = address(this).balance;
-    require(vendorEthBalance &gt; amountOfEth, "Vendor does not have enough ETH");
-
-    // Transfer tokens
-    (bool sent) = yourToken.transferFrom(user, address(this), amount);
-    require(sent, "Failed to transfer tokens");
-
-    // Transfer ETH
-    (bool ethSent, ) = user.call{value: amountOfEth }("");
-    require(ethSent, "Failed to send back eth");
-
-    // Emit sell event
-    emit SellTokens(user, amountOfEth, amount);
-  }
-}</code></pre>
-<p>Deployed UI: <a href="https://thundering-process.surge.sh/">https://thundering-process.surge.sh/</a></p>
-</section>
-<section id="checkpoint-2-your-token" class="level1">
-<h1>Checkpoint 2: 🏵Your Token 💵</h1>
-<p>The first thing we need to do is create our ERC20 token. We’re using the popular OpenZeppelin library to create the token.</p>
-<pre class="solidity"><code>contract YourToken is ERC20 {
-    constructor() ERC20("Gold", "GLD") {
-        _mint(msg.sender, 1000 * 10 ** 18);
-    }
-}</code></pre>
-<p>What we need to do is update the address we’re minting too. Otherwise this is boilerplate for minting ERC20 tokens.</p>
-</section>
-<section id="checkpoint-3-vendor" class="level1">
-<h1>Checkpoint 3: ⚖️ Vendor 🤖</h1>
-<p>For this checkpoint, I need to implement the ability to buy these new tokens</p>
-<pre class="solidity"><code>  // Events
-  event BuyTokens(address buyer, uint256 amountOfETH, uint256 amountOfTokens);
-
-  /// Allow users to buy tokens
-  function buyTokens() public payable {
-    // Validate the user sent eth
-    uint256 amountOfEth = msg.value;
-    require(amountOfEth &gt; 0, "Send some ETH to buy tokens");
-
-    // Validate the vendor has enough tokens
-    uint256 amountOfTokens = amountOfEth * tokensPerEth;
-    uint256 vendorBalance = yourToken.balanceOf(address(this));
-    require(vendorBalance &gt;= amountOfTokens, "Vendor does not have enough tokens");
-
-    // Send the tokens
-    address buyer = msg.sender;
-    (bool sent) = yourToken.transfer(buyer, amountOfTokens);
-    require(sent, "Failed to transfer token");
-
-    // Emit buy event
-    emit BuyTokens(buyer, amountOfEth, amountOfTokens);
-  }</code></pre>
-<p>After all the validation, we transfer tokens with</p>
-<pre class="solidity"><code>address buyer = msg.sender;
-(bool sent) = yourToken.transfer(buyer, amountOfTokens);</code></pre>
-<p>and then emit the buy event so the UI can update</p>
-<pre class="solidity"><code>emit BuyTokens(buyer, amountOfEth, amountOfTokens);</code></pre>
-<p>Then we add a withdraw function so the owner can withdraw ETH from the contract</p>
-</section>
-<section id="checkpoint-4-vendor-buyback" class="level1">
-<h1>Checkpoint 4: 🤔 Vendor Buyback 🤯</h1>
-<p>In order to buy tokens back, we need to implement the “Approve” pattern for ERC20s.</p>
-<section id="the-approve-pattern" class="level2">
-<h2 class="anchored" data-anchor-id="the-approve-pattern">The Approve Pattern</h2>
-<p>In order for a contract to move tokens in your wallet, you need to approve the contract to do so. This means that there needs to be 2 transactions in order for the vendor to buy your tokens back.</p>
-<ol type="1">
-<li><p>Your wallet approves the vendor contract and an associated number of tokens.</p></li>
-<li><p>Your wallet sends the transaction to sell tokens back.</p></li>
-</ol>
-<p>This is why using sites like Uniswap is a 2 step process. You first need to approve Uniswap to move the tokens for you and then send another transaction to actually swap the tokens.</p>
-<p>The ERC20 token contract provided by OpenZeppelin comes with an Approve function. Update the UI to expose the button to approve. After the user approves, we can move the tokens out of their wallet back to the vendor. Then the vendor sends ETH to the caller.</p>
-<pre class="solidity"><code>  /// Allow users to sell tokens back to the vendor
-  function sellTokens(uint256 amount) public {
-    // Validate token amount
-    require(amount &gt; 0, "Must sell a token amount greater than 0");
-
-    // Validate the user has the tokens to sell
-    address user = msg.sender;
-    uint256 userBalance = yourToken.balanceOf(user);
-    require(userBalance &gt;= amount, "User does not have enough tokens");
-
-    // Validate the vendor has enough ETH
-    uint256 amountOfEth = amount / tokensPerEth;
-    uint256 vendorEthBalance = address(this).balance;
-    require(vendorEthBalance &gt; amountOfEth, "Vendor does not have enough ETH");
-
-    // Transfer tokens
-    (bool sent) = yourToken.transferFrom(user, address(this), amount);
-    require(sent, "Failed to transfer tokens");
-
-    // Transfer ETH
-    (bool ethSent, ) = user.call{value: amountOfEth }("");
-    require(ethSent, "Failed to send back eth");
-
-    // Emit sell event
-    emit SellTokens(user, amountOfEth, amount);
-  }</code></pre>
-</section>
-</section>
-<section id="so-what-did-i-do" class="level1">
-<h1>So What Did I Do?</h1>
-<p>I’ve now implemented a token vendor which can buy and sell the token that I created.</p>
-<p>At this point, I updated the code to deploy to Rinkeby and deployed the UI to surge.</p>
-<p>On to the next challenge.</p>
-<p>See you then!</p>
 
 
 </section>

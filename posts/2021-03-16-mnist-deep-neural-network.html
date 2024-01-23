@@ -6,6 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Leo Gau">
 <meta name="dcterms.date" content="2021-03-16">
 <meta name="description" content="Adding a hidden layer increased my accuracy by over 20%">
 
@@ -129,12 +130,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/"> <i class="bi bi-github" role="img">
+    <a class="nav-link" href="https://github.com/leogau"> <i class="bi bi-github" role="img">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://twitter.com"> <i class="bi bi-twitter" role="img">
+    <a class="nav-link" href="https://twitter.com/leogau"> <i class="bi bi-twitter" role="img">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -166,6 +167,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   
   <div class="quarto-title-meta">
 
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Leo Gau </p>
+            </div>
+    </div>
       
       <div>
       <div class="quarto-title-meta-heading">Published</div>
@@ -243,8 +250,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(<span class="bu">input</span>)):</span>
 <span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>                layer_0 <span class="op">=</span> <span class="bu">input</span>[j]</span>
 <span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>                layer_1 <span class="op">=</span> relu(np.dot(layer_0, <span class="va">self</span>.weights_0_1))</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>                layer_2 <span class="op">=</span> np.dot(layer_1, <span class="va">self</span>.weights_1_2)    </span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>                </span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>                layer_2 <span class="op">=</span> np.dot(layer_1, <span class="va">self</span>.weights_1_2)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>                label <span class="op">=</span> labels[j]</span>
 <span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>                goal <span class="op">=</span> np.zeros(<span class="dv">10</span>)</span>
 <span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>                goal[label] <span class="op">=</span> <span class="dv">1</span></span>
@@ -256,7 +263,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.weights_1_2 <span class="op">=</span> <span class="va">self</span>.weights_1_2 <span class="op">-</span> (<span class="va">self</span>.alpha <span class="op">*</span> layer_1.T.dot(layer_2_delta))</span>
 <span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.weights_0_1 <span class="op">=</span> <span class="va">self</span>.weights_0_1 <span class="op">-</span> (<span class="va">self</span>.alpha <span class="op">*</span> layer_0.T.dot(layer_1_delta))</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">"Error: "</span> <span class="op">+</span> <span class="bu">str</span>(layer_2_error))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="cell-5" class="cell">
@@ -387,8 +394,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(<span class="bu">input</span>)):</span>
 <span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>                layer_0 <span class="op">=</span> <span class="bu">input</span>[j]</span>
 <span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>                layer_1 <span class="op">=</span> relu(np.dot(layer_0, <span class="va">self</span>.weights_0_1))</span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>                layer_2 <span class="op">=</span> np.dot(layer_1, <span class="va">self</span>.weights_1_2)    </span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>                </span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>                layer_2 <span class="op">=</span> np.dot(layer_1, <span class="va">self</span>.weights_1_2)</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>                label <span class="op">=</span> labels[j]</span>
 <span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>                goal <span class="op">=</span> np.zeros(<span class="dv">10</span>)</span>
 <span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>                goal[label] <span class="op">=</span> <span class="dv">1</span></span>
@@ -397,13 +404,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>                layer_2_delta <span class="op">=</span> (layer_2 <span class="op">-</span> goal)</span>
 <span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>                layer_1_delta <span class="op">=</span> layer_2_delta.dot(<span class="va">self</span>.weights_1_2.T) <span class="op">*</span> relu2deriv(layer_1)</span>
-<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>                </span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>                layer_2_weight_delta <span class="op">=</span> layer_1.T.dot(layer_2_delta)</span>
 <span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>                layer_1_weight_delta <span class="op">=</span> layer_0.T.dot(layer_1_delta)</span>
 <span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.weights_1_2 <span class="op">=</span> <span class="va">self</span>.weights_1_2 <span class="op">-</span> (<span class="va">self</span>.alpha <span class="op">*</span> layer_2_weight_delta)</span>
 <span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.weights_0_1 <span class="op">=</span> <span class="va">self</span>.weights_0_1 <span class="op">-</span> (<span class="va">self</span>.alpha <span class="op">*</span> layer_1_weight_delta)</span>
-<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">"Error: "</span> <span class="op">+</span> <span class="bu">str</span>(layer_2_error))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="cell-21" class="cell" data-execution_count="17">
